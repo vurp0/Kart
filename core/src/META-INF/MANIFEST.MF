@@ -1,0 +1,14 @@
+Manifest-Version: 1.0
+Class-Path: gdx-controllers-desktop-1.6.6-SNAPSHOT.jar gdx-backend-lwj
+ gl-1.6.6-SNAPSHOT.jar jinput-platform-2.0.5-natives-windows.jar gdx-j
+ nigen-1.0.0.jar jutils-1.0.0.jar gdx-platform-1.6.6-SNAPSHOT-natives-
+ desktop.jar javaparser-1.0.8.jar lwjgl_util-2.9.2.jar jinput-platform
+ -2.0.5-natives-linux.jar lwjgl-platform-2.9.2-natives-osx.jar jglfw-p
+ latform-1.1-natives-desktop.jar gdx-backend-jglfw-1.6.6-SNAPSHOT.jar 
+ gdx-controllers-platform-1.6.6-SNAPSHOT-natives-desktop.jar lwjgl-2.9
+ .2.jar gdx-1.6.6-SNAPSHOT.jar jinput-2.0.5.jar lwjgl-platform-2.9.2-n
+ atives-windows.jar jinput-platform-2.0.5-natives-osx.jar lwjgl-platfo
+ rm-2.9.2-natives-linux.jar jlayer-1.0.1-gdx.jar jorbis-0.0.17.jar jgl
+ fw-1.1.jar gdx-controllers-1.6.6-SNAPSHOT.jar
+Main-Class: org.sandholm.max.kart.desktop.DesktopLauncher
+

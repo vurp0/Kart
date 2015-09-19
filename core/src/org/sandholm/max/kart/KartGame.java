@@ -14,14 +14,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class KartGame implements ApplicationListener {
+	static float CAMERA_HEIGHT = 1.5f;
+
 	SpriteBatch batch;
 	Texture img;
 	PerspectiveCamera camera;
 
     MyInputProcessor inputProcessor;
-
-	float angle;
-	static float MOVEMENT_SPEED = 0.1f;
 
 	Kart playerKart;
 
@@ -40,7 +39,7 @@ public class KartGame implements ApplicationListener {
 		batch = new SpriteBatch();
 		img = new Texture("ground.png");
 
-		playerKart = new Kart(100f, new Vector2(0,0));
+		playerKart = new Kart(100f, new Vector2(90,40), 90);
 
         inputProcessor = new MyInputProcessor();
         Gdx.input.setInputProcessor(inputProcessor);
@@ -54,31 +53,38 @@ public class KartGame implements ApplicationListener {
 	@Override
 	public void render() {
         float deltaTime = Gdx.graphics.getDeltaTime();
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			camera.translate((float) -Math.sin(Math.toRadians(angle))*MOVEMENT_SPEED, (float) Math.cos(Math.toRadians(angle))*MOVEMENT_SPEED, 0f);
-		}/*
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			camera.translate((float) Math.sin(Math.toRadians(angle))*MOVEMENT_SPEED, (float) -Math.cos(Math.toRadians(angle))*MOVEMENT_SPEED, 0f);
-		}
+			playerKart.brake();
+		}/*
 		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
 			camera.translate((float) -Math.cos(Math.toRadians(angle))*MOVEMENT_SPEED, (float) -Math.sin(Math.toRadians(angle))*MOVEMENT_SPEED, 0f);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
 			camera.translate((float) Math.cos(Math.toRadians(angle))*MOVEMENT_SPEED, (float) Math.sin(Math.toRadians(angle))*MOVEMENT_SPEED, 0f);
 		}*/
-		if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            playerKart.turn(Kart.Direction.LEFT, deltaTime);
+		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            playerKart.turn(Kart.Direction.LEFT, deltaTime, false);
 		}
-		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            playerKart.turn(Kart.Direction.RIGHT, deltaTime);
-
+		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            playerKart.turn(Kart.Direction.RIGHT, deltaTime, false);
 		}
-        playerKart.update(deltaTime);
+		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+			playerKart.turn(Kart.Direction.LEFT, deltaTime, true);
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+			playerKart.turn(Kart.Direction.RIGHT, deltaTime, true);
+		}
 
-		camera.position.set(new Vector3(playerKart.getPosition(), 0).add(0f, -5f, 2f));
-        camera.up.set(0f,0f,1f);
+		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+			//camera.translate((float) -Math.sin(Math.toRadians(angle))*MOVEMENT_SPEED, (float) Math.cos(Math.toRadians(angle))*MOVEMENT_SPEED, 0f);
+			playerKart.accelerate();
+		}
+		playerKart.update(deltaTime);
+
+		camera.position.set(new Vector3(playerKart.getPosition(), 0).add(-5f, 0f, CAMERA_HEIGHT));
+		camera.up.set(0f,0f,1f);
         camera.rotateAround(new Vector3(playerKart.getPosition(), 0), new Vector3(0f, 0f, 1f), playerKart.getRotation());
-        camera.lookAt(new Vector3(playerKart.getPosition(), 2f));
+		camera.lookAt(new Vector3(playerKart.getPosition(), CAMERA_HEIGHT));
 		camera.update();
 
 		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
@@ -88,6 +94,9 @@ public class KartGame implements ApplicationListener {
 		batch.draw(img, 0f, 0f, 100f, 100f);
 		batch.end();
 		Gdx.graphics.setTitle(String.valueOf(Gdx.graphics.getFramesPerSecond()));
+
+		playerKart.stopAccelerating();
+		playerKart.stopBraking();
 
 	}
 
@@ -110,18 +119,11 @@ public class KartGame implements ApplicationListener {
 
 		@Override
 		public boolean keyDown(int keycode) {
-            if (keycode == Input.Keys.W) {
-                playerKart.startAccelerating();
-            }
 			return false;
 		}
 
 		@Override
 		public boolean keyUp(int keycode) {
-
-            if (keycode == Input.Keys.W) {
-                playerKart.stopAccelerating();
-            }
             return false;
 		}
 
