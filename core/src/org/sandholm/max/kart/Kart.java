@@ -96,6 +96,8 @@ public class Kart {
         rotation %= 360;
         if (!drift) {
             friction = 140f;
+        } else {
+            friction = 90f;
         }
     }
 

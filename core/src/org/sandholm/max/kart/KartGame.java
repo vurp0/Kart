@@ -8,17 +8,25 @@ import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
-import com.badlogic.gdx.graphics.g3d.utils.CameraInputController;
-import com.badlogic.gdx.math.Matrix4;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
+import com.badlogic.gdx.graphics.g3d.decals.Decal;
+import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 
 public class KartGame implements ApplicationListener {
 	static float CAMERA_HEIGHT = 1.5f;
 
-	SpriteBatch batch;
-	Texture img;
+	SpriteBatch spriteBatch;
+	DecalBatch decalBatch;
+	Texture groundTexture;
+	Texture kartTextureSheet;
+	TextureRegion kartTextureRegion;
 	PerspectiveCamera camera;
+
+	Decal groundDecal;
+	Decal kartDecal;
 
     MyInputProcessor inputProcessor;
 
@@ -36,10 +44,17 @@ public class KartGame implements ApplicationListener {
 		camera.far = 10000f;
 		camera.update();
 
-		batch = new SpriteBatch();
-		img = new Texture("ground.png");
+		//spriteBatch = new SpriteBatch();
+		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
+		groundTexture = new Texture("ground.png");
+		kartTextureSheet = new Texture("supermariokart_characters_sheet.png");
+		kartTextureRegion = new TextureRegion(kartTextureSheet, 1*40, 0, 32, 32);
 
-		playerKart = new Kart(100f, new Vector2(90,40), 90);
+
+		groundDecal = Decal.newDecal(100, 100, new TextureRegion(groundTexture));
+		kartDecal = Decal.newDecal(1, 1, kartTextureRegion);
+
+		playerKart = new Kart(100f, new Vector2(0,0), 0);
 
         inputProcessor = new MyInputProcessor();
         Gdx.input.setInputProcessor(inputProcessor);
@@ -74,9 +89,7 @@ public class KartGame implements ApplicationListener {
 		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
 			playerKart.turn(Kart.Direction.RIGHT, deltaTime, true);
 		}
-
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			//camera.translate((float) -Math.sin(Math.toRadians(angle))*MOVEMENT_SPEED, (float) Math.cos(Math.toRadians(angle))*MOVEMENT_SPEED, 0f);
 			playerKart.accelerate();
 		}
 		playerKart.update(deltaTime);
@@ -87,12 +100,19 @@ public class KartGame implements ApplicationListener {
 		camera.lookAt(new Vector3(playerKart.getPosition(), CAMERA_HEIGHT));
 		camera.update();
 
-		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		batch.begin();
-		batch.setProjectionMatrix(camera.combined);
-		batch.draw(img, 0f, 0f, 100f, 100f);
-		batch.end();
+		Gdx.gl.glClearColor(0.4f, 0.5f, 1f, 1f);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+		decalBatch.add(groundDecal);
+
+		kartDecal.setPosition(new Vector3(playerKart.getPosition(), 0.5f));
+		kartDecal.setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
+		decalBatch.add(kartDecal);
+		decalBatch.flush();
+		/*spriteBatch.begin();
+		spriteBatch.setProjectionMatrix(camera.combined);
+		spriteBatch.draw(groundTexture, 0f, 0f, 100f, 100f);
+		spriteBatch.end();*/
 		Gdx.graphics.setTitle(String.valueOf(Gdx.graphics.getFramesPerSecond()));
 
 		playerKart.stopAccelerating();

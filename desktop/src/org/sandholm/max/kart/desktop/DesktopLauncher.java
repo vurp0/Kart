@@ -15,12 +15,16 @@ public class DesktopLauncher {
 		 * Let's hope for the day when this bug disappears as mysteriously as it appeared.
 		 */
 
-		//LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		JglfwApplicationConfiguration config = new JglfwApplicationConfiguration();
+		/* Also, my laptop is 32-bit, and JGLFW doesn't compile properly
+		 * for 32-bit Linux, so on my laptop I have to use LWJGL instead.
+		 */
+
+		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		//JglfwApplicationConfiguration config = new JglfwApplicationConfiguration();
 		config.forceExit = false;
 		config.height = 480;
 		config.width = 800;
-		//new LwjglApplication(new KartGame(), config);
-		new JglfwApplication(new KartGame(), config);
+		new LwjglApplication(new KartGame(), config);
+		//new JglfwApplication(new KartGame(), config);
 	}
 }
