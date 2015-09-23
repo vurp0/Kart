@@ -8,9 +8,10 @@ import com.badlogic.gdx.math.Vector2;
 public class Kart {
     public enum Direction{LEFT, RIGHT}
     float TOP_SPEED;                    //per second
-    static float TURNING_SPEED = 50f;   //per second
+    static float TURNING_SPEED = 60f;   //per second
+    static float DRIFTING_SPEED = 75f;
     static float MASS = 1f;             //kilograms
-    static float ENGINE_FORCE = 1000f;  //newtons, completely realistic
+    static float ENGINE_FORCE = 1200f;  //newtons, completely realistic
     static float FRICTION_S = 70f;
 
     float friction = 60f;         //coefficient of friction
@@ -80,8 +81,8 @@ public class Kart {
     }
 
     public void brake() {
-        brakeForce.set(120f*velocity.len(),0);
-        brakeForce.setAngle((velocity.angle()-180f)%360);
+        brakeForce.set(120f*velocity.len()-350f,0);
+        brakeForce.setAngle((rotation-180f)%360);
     }
 
     public void stopBraking() {
@@ -92,12 +93,15 @@ public class Kart {
         //engineForce.setAngle(engineForce.angle()+10*(dir == Direction.LEFT ? -1 : 1));
         //engineForce.set(engineForce.x, engineForce.x*(dir == Direction.LEFT ? -1 : 1));
         //acceleration.setAngle(acceleration.angle()+TURNING_SPEED*deltaTime*(dir == Direction.LEFT ? -1 : 1));
-        rotation += TURNING_SPEED*deltaTime*(dir == Direction.LEFT ? 1 : -1);
-        rotation %= 360;
+
         if (!drift) {
+            rotation += TURNING_SPEED*deltaTime*(dir == Direction.LEFT ? 1 : -1);
+            rotation = (rotation % 360 + 360) % 360;
             friction = 140f;
         } else {
-            friction = 90f;
+            rotation += DRIFTING_SPEED*deltaTime*(dir == Direction.LEFT ? 1 : -1);
+            rotation = (rotation % 360 + 360) % 360;
+            friction = 70f;
         }
     }
 
