@@ -1,6 +1,7 @@
 package org.sandholm.max.kart;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
 
 /**
  * Kart physics class
@@ -16,6 +17,8 @@ public class Kart {
 
     float friction = 60f;         //coefficient of friction
 
+    Body pBody;
+
     Vector2 position;
     Vector2 velocity;      //length of velocity is value with unit m/s
     float rotation;
@@ -26,11 +29,23 @@ public class Kart {
     Vector2 brakeForce;
 
 
-    public Kart(float topSpeed, Vector2 position, float rotation) {
+    public Kart(float topSpeed, Vector2 position, float rotation, World world) {
         TOP_SPEED = topSpeed;
         this.position = position;
         this.rotation = rotation;
         velocity = new Vector2();
+
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = BodyDef.BodyType.DynamicBody;
+        bodyDef.position.set(this.position);
+        pBody = world.createBody(bodyDef);
+        PolygonShape shape = new PolygonShape();
+        shape.setAsBox(1, 1, new Vector2(0.5f, 0.5f), rotation);
+        FixtureDef fixtureDef = new FixtureDef();
+        fixtureDef.shape = shape;
+        fixtureDef.density = 1f;
+        Fixture fixture = pBody.createFixture(fixtureDef);
+        shape.dispose();
 
         acceleration = new Vector2();
         engineForce = new Vector2();

@@ -3,8 +3,6 @@ package org.sandholm.max.kart;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
@@ -13,11 +11,15 @@ import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.physics.box2d.*;
 
 import java.util.ArrayList;
 
 public class KartScreen implements Screen {
 	KartGame game;
+
+	World gameWorld;
+
 
 	static float CAMERA_HEIGHT = 3f;
 
@@ -57,47 +59,33 @@ public class KartScreen implements Screen {
 		camera.far = 10000f;
 		camera.update();
 
+		gameWorld = new World(Vector2.Zero, true);
+
 		//spriteBatch = new SpriteBatch();
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		groundTexture = new Texture("ground2.png");
-		kartTextureSheet = new Texture("supermariokart_characters_sheet.png");
+		kartTextureSheet = new Texture("mario.png");
 		kartTextureRegions = new TextureRegion[22];
-		kartTextureRegions[0] = new TextureRegion(kartTextureSheet, 1 * 40, 0 * 40, 32, 30);        //this huge mass will maybe eventually be replaced with automation
-		kartTextureRegions[1] = new TextureRegion(kartTextureSheet, 2 * 40, 0 * 40, 32, 30);
-		kartTextureRegions[2] = new TextureRegion(kartTextureSheet, 3 * 40, 0 * 40, 32, 30);
-		kartTextureRegions[3] = new TextureRegion(kartTextureSheet, 4 * 40, 0 * 40, 32, 30);
-		kartTextureRegions[4] = new TextureRegion(kartTextureSheet, 5 * 40, 0 * 40, 32, 30);
-		kartTextureRegions[5] = new TextureRegion(kartTextureSheet, 0 * 40, 1 * 40, 32, 30);
-		kartTextureRegions[6] = new TextureRegion(kartTextureSheet, 1 * 40, 1 * 40, 32, 30);
-		kartTextureRegions[7] = new TextureRegion(kartTextureSheet, 2 * 40, 1 * 40, 32, 30);
-		kartTextureRegions[8] = new TextureRegion(kartTextureSheet, 3 * 40, 1 * 40, 32, 30);
-		kartTextureRegions[9] = new TextureRegion(kartTextureSheet, 4 * 40, 1 * 40, 32, 30);
-		kartTextureRegions[10] = new TextureRegion(kartTextureSheet, 5 * 40, 1 * 40, 32, 30);
-		kartTextureRegions[11] = new TextureRegion(kartTextureSheet, 0 * 40, 0 * 40, 32, 30);
-		kartTextureRegions[12] = new TextureRegion(kartTextureSheet, 5 * 40 + 32, 1 * 40, -32, 30);
-		kartTextureRegions[13] = new TextureRegion(kartTextureSheet, 4 * 40 + 32, 1 * 40, -32, 30);
-		kartTextureRegions[14] = new TextureRegion(kartTextureSheet, 3 * 40 + 32, 1 * 40, -32, 30);
-		kartTextureRegions[15] = new TextureRegion(kartTextureSheet, 2 * 40 + 32, 1 * 40, -32, 30);
-		kartTextureRegions[16] = new TextureRegion(kartTextureSheet, 1 * 40 + 32, 1 * 40, -32, 30);
-		kartTextureRegions[17] = new TextureRegion(kartTextureSheet, 0 * 40 + 32, 1 * 40, -32, 30);
-		kartTextureRegions[18] = new TextureRegion(kartTextureSheet, 5 * 40 + 32, 0 * 40, -32, 30);
-		kartTextureRegions[19] = new TextureRegion(kartTextureSheet, 4 * 40 + 32, 0 * 40, -32, 30);
-		kartTextureRegions[20] = new TextureRegion(kartTextureSheet, 3 * 40 + 32, 0 * 40, -32, 30);
-		kartTextureRegions[21] = new TextureRegion(kartTextureSheet, 2 * 40 + 32, 0 * 40, -32, 30);
+		for (int i=0; i<=11; i++){  //make TextureRegions from the normal sprites
+			kartTextureRegions[i] = new TextureRegion(kartTextureSheet, i*32, 0, 32, 32);
+		}
+		for (int i=12; i<=21; i++){ //make TextureRegions from the sprites flipped to make the complete circle
+			kartTextureRegions[i] = new TextureRegion(kartTextureSheet, (22-i)*32+32, 0, -32, 32);
+		}
 
 		groundDecal = Decal.newDecal(100, 100, new TextureRegion(groundTexture));
-		kartDecal = Decal.newDecal(1, 0.9375f, kartTextureRegions[0], true);
+		kartDecal = Decal.newDecal(1, 1f, kartTextureRegions[0], true);
 
-		playerKart = new Kart(100f, new Vector2(0, 0), 0);
+		playerKart = new Kart(100f, new Vector2(0, 0), 0, gameWorld);
 
 		otherKarts = new ArrayList<Kart>();
 		otherKartDecal = new ArrayList<Decal>();
 
 		for (int i = 0; i < 120; i++) {
-			otherKarts.add(new Kart(0f, new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360));
+			otherKarts.add(new Kart(0f, new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
 		}
 		for (int i = 0; i < 120; i++) {
-			otherKartDecal.add(Decal.newDecal(1, 0.9375f, kartTextureRegions[0], true));
+			otherKartDecal.add(Decal.newDecal(1, 1f, kartTextureRegions[0], true));
 		}
 
 		//inputProcessor = new MyInputProcessor();
@@ -118,6 +106,8 @@ public class KartScreen implements Screen {
 
         //float deltaTime = Gdx.graphics.getDeltaTime();
 		stateTime += deltaTime;
+
+		gameWorld.step(deltaTime, 6, 2);
 
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
 			playerKart.brake();
@@ -152,7 +142,7 @@ public class KartScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 		decalBatch.add(groundDecal);
-		kartDecal.setTextureRegion(kartTextureRegions[degreesToFrame(cameraAngle - playerKart.getRotation(), 22)]);
+		kartDecal.setTextureRegion(kartTextureRegions[degreesToFrame(cameraAngle/* - playerKart.getRotation()*/, 22)]);
 		kartDecal.setPosition(playerKart.getPosition().x, playerKart.getPosition().y, 0.5f);
 		kartDecal.setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
 
