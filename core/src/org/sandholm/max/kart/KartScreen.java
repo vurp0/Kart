@@ -81,10 +81,10 @@ public class KartScreen implements Screen {
 		otherKarts = new ArrayList<Kart>();
 		otherKartDecal = new ArrayList<Decal>();
 
-		for (int i = 0; i < 120; i++) {
+		for (int i = 0; i < 1; i++) {
 			otherKarts.add(new Kart(0f, new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
 		}
-		for (int i = 0; i < 120; i++) {
+		for (int i = 0; i < 1; i++) {
 			otherKartDecal.add(Decal.newDecal(1, 1f, kartTextureRegions[0], true));
 		}
 
@@ -107,8 +107,6 @@ public class KartScreen implements Screen {
         //float deltaTime = Gdx.graphics.getDeltaTime();
 		stateTime += deltaTime;
 
-		gameWorld.step(deltaTime, 6, 2);
-
 		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
 			playerKart.brake();
 		}
@@ -127,29 +125,32 @@ public class KartScreen implements Screen {
 		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
 			playerKart.accelerate();
 		}
+
 		playerKart.update(deltaTime);
+
+		gameWorld.step(deltaTime, 6, 2);
 
 		cameraAngle = MathUtils.radiansToDegrees*MathUtils.lerpAngle(MathUtils.degreesToRadians*cameraAngle, MathUtils.degreesToRadians*playerKart.getRotation(), 0.05f);
 
 		camera.position.set(new Vector3(playerKart.getPosition(), 0).add(-7f, 0f, CAMERA_HEIGHT));
 		camera.up.set(0f, 0f, 1f);
 		camera.rotateAround(new Vector3(playerKart.getPosition(), 0), new Vector3(0f, 0f, 1f), cameraAngle);
-		camera.lookAt(new Vector3(playerKart.getPosition(), CAMERA_HEIGHT-1.5f));
+		camera.lookAt(new Vector3(playerKart.getPosition(), CAMERA_HEIGHT - 1.5f));
 		camera.update();
-
 
 		Gdx.gl.glClearColor(0.4f, 0.5f, 1f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 		decalBatch.add(groundDecal);
-		kartDecal.setTextureRegion(kartTextureRegions[degreesToFrame(cameraAngle/* - playerKart.getRotation()*/, 22)]);
+		kartDecal.setTextureRegion(kartTextureRegions[degreesToFrame(cameraAngle - playerKart.getRotation(), 22)]);
 		kartDecal.setPosition(playerKart.getPosition().x, playerKart.getPosition().y, 0.5f);
 		kartDecal.setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
 
+
 		decalBatch.add(kartDecal);
-		for (int i=0; i<120; i++) {
-			otherKarts.get(i).accelerate();
-			otherKarts.get(i).turn(Kart.Direction.LEFT, deltaTime, true);
+		for (int i=0; i<1; i++) {
+			//otherKarts.get(i).accelerate();
+			//otherKarts.get(i).turn(Kart.Direction.LEFT, deltaTime, true);
 			otherKarts.get(i).update(deltaTime);
 			otherKarts.get(i).stopAccelerating();
 			otherKarts.get(i).stopBraking();
@@ -164,6 +165,7 @@ public class KartScreen implements Screen {
 
 		playerKart.stopAccelerating();
 		playerKart.stopBraking();
+		playerKart.resetFrame();
 
 	}
 

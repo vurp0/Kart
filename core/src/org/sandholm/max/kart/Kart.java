@@ -1,5 +1,6 @@
 package org.sandholm.max.kart;
 
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 
@@ -12,7 +13,7 @@ public class Kart {
     static float TURNING_SPEED = 60f;   //per second
     static float DRIFTING_SPEED = 75f;
     static float MASS = 1f;             //kilograms
-    static float ENGINE_FORCE = 1200f;  //newtons, completely realistic
+    static float ENGINE_FORCE = 150f;  //newtons, completely realistic
     static float FRICTION_S = 70f;
 
     float friction = 60f;         //coefficient of friction
@@ -38,12 +39,16 @@ public class Kart {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = BodyDef.BodyType.DynamicBody;
         bodyDef.position.set(this.position);
+        bodyDef.angle = rotation*MathUtils.degreesToRadians;
+        bodyDef.fixedRotation = true;
         pBody = world.createBody(bodyDef);
         PolygonShape shape = new PolygonShape();
-        shape.setAsBox(1, 1, new Vector2(0.5f, 0.5f), rotation);
+        shape.setAsBox(0.5f, 0.5f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 1f;
+        fixtureDef.density = 5f;
+        pBody.setLinearDamping(2f);
+        //pBody.setAngularDamping(10f);
         Fixture fixture = pBody.createFixture(fixtureDef);
         shape.dispose();
 
@@ -54,7 +59,7 @@ public class Kart {
     }
 
     public void update(float deltaTime) {
-        frictionForce.set(friction*velocity.len(), 0f);
+        /*frictionForce.set(friction*velocity.len(), 0f);
         frictionForce.setAngle((velocity.angle() - 180f) % 360);
 
         Vector2 resultantForce = new Vector2();
@@ -66,11 +71,16 @@ public class Kart {
         acceleration.setAngle(resultantForce.angle());
 
         velocity.add(acceleration.cpy().scl(deltaTime));
-        position.add(velocity.cpy().scl(deltaTime));
+        position.add(velocity.cpy().scl(deltaTime));*/
+        position.set(pBody.getPosition());
         //System.out.println(position);
-
-        //rotation = velocity.angle();
+        pBody.setTransform(pBody.getPosition(), rotation*MathUtils.degreesToRadians);
+        //rotation = pBody.getAngle()* MathUtils.radiansToDegrees;
         friction = FRICTION_S;
+    }
+
+    public void resetFrame() {
+        pBody.setLinearDamping(2f);
     }
 
     public Vector2 getPosition() {
@@ -86,8 +96,10 @@ public class Kart {
     }
 
     public void accelerate() {
-        engineForce.set(ENGINE_FORCE, 0);
-        engineForce.setAngle(rotation);
+        pBody.applyForceToCenter(new Vector2(ENGINE_FORCE, 0).rotate(rotation), true);
+
+        //engineForce.set(ENGINE_FORCE, 0);
+        //engineForce.setAngle(rotation);
     }
 
     public void stopAccelerating() {
@@ -96,8 +108,9 @@ public class Kart {
     }
 
     public void brake() {
-        brakeForce.set(120f*velocity.len()-350f,0);
-        brakeForce.setAngle((rotation-180f)%360);
+        pBody.applyForceToCenter(pBody.getLinearVelocity().cpy().rotate(180).scl(1.5f).add(new Vector2(-35f, 0).rotate(rotation)), true);
+        //brakeForce.set(120f*velocity.len()-350f,0);
+        //brakeForce.setAngle((rotation-180f)%360);
     }
 
     public void stopBraking() {
@@ -110,12 +123,15 @@ public class Kart {
         //acceleration.setAngle(acceleration.angle()+TURNING_SPEED*deltaTime*(dir == Direction.LEFT ? -1 : 1));
 
         if (!drift) {
+            //pBody.applyTorque(TURNING_SPEED*(dir == Direction.LEFT ? 1 : -1), true);
+
             rotation += TURNING_SPEED*deltaTime*(dir == Direction.LEFT ? 1 : -1);
             rotation = (rotation % 360 + 360) % 360;
             friction = 140f;
         } else {
             rotation += DRIFTING_SPEED*deltaTime*(dir == Direction.LEFT ? 1 : -1);
             rotation = (rotation % 360 + 360) % 360;
+            pBody.setLinearDamping(0.75f);
             friction = 70f;
         }
     }
