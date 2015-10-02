@@ -81,10 +81,10 @@ public class KartScreen implements Screen {
 		otherKarts = new ArrayList<Kart>();
 		otherKartDecal = new ArrayList<Decal>();
 
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 50; i++) {
 			otherKarts.add(new Kart(0f, new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
 		}
-		for (int i = 0; i < 1; i++) {
+		for (int i = 0; i < 50; i++) {
 			otherKartDecal.add(Decal.newDecal(1, 1f, kartTextureRegions[0], true));
 		}
 
@@ -148,9 +148,9 @@ public class KartScreen implements Screen {
 
 
 		decalBatch.add(kartDecal);
-		for (int i=0; i<1; i++) {
-			//otherKarts.get(i).accelerate();
-			//otherKarts.get(i).turn(Kart.Direction.LEFT, deltaTime, true);
+		for (int i=0; i<50; i++) {
+			otherKarts.get(i).accelerate();
+			otherKarts.get(i).turn(Kart.Direction.LEFT, deltaTime, false);
 			otherKarts.get(i).update(deltaTime);
 			otherKarts.get(i).stopAccelerating();
 			otherKarts.get(i).stopBraking();

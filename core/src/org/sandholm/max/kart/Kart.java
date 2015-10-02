@@ -47,6 +47,7 @@ public class Kart {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 5f;
+        fixtureDef.restitution = 2f;
         pBody.setLinearDamping(2f);
         //pBody.setAngularDamping(10f);
         Fixture fixture = pBody.createFixture(fixtureDef);
@@ -85,10 +86,6 @@ public class Kart {
 
     public Vector2 getPosition() {
         return position;
-    }
-
-    public float getDrawRotation() {
-        return velocity.angle();
     }
 
     public float getRotation() {
@@ -131,8 +128,9 @@ public class Kart {
         } else {
             rotation += DRIFTING_SPEED*deltaTime*(dir == Direction.LEFT ? 1 : -1);
             rotation = (rotation % 360 + 360) % 360;
-            pBody.setLinearDamping(0.75f);
-            friction = 70f;
+            pBody.applyForceToCenter(new Vector2(15f, -2f).rotate(rotation+90*(dir == Direction.LEFT ? -1 : 1)), true);
+            //pBody.setLinearDamping(0.9f);
+            //friction = 70f;
         }
     }
 
