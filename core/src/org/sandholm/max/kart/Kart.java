@@ -14,7 +14,7 @@ public class Kart {
     static float DRIFTING_SPEED = 75f;
     static float MASS = 1f;             //kilograms
     static float ENGINE_FORCE = 150f;  //newtons, completely realistic
-    static float FRICTION_S = 70f;
+    static float FRICTION_S = 2f;
 
     float friction = 60f;         //coefficient of friction
 
@@ -47,8 +47,8 @@ public class Kart {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
         fixtureDef.density = 5f;
-        fixtureDef.restitution = 2f;
-        pBody.setLinearDamping(2f);
+        fixtureDef.restitution = 1f;
+        pBody.setLinearDamping(FRICTION_S);
         //pBody.setAngularDamping(10f);
         Fixture fixture = pBody.createFixture(fixtureDef);
         shape.dispose();
@@ -77,11 +77,11 @@ public class Kart {
         //System.out.println(position);
         pBody.setTransform(pBody.getPosition(), rotation*MathUtils.degreesToRadians);
         //rotation = pBody.getAngle()* MathUtils.radiansToDegrees;
-        friction = FRICTION_S;
+        //friction = FRICTION_S;
     }
 
     public void resetFrame() {
-        pBody.setLinearDamping(2f);
+        pBody.setLinearDamping(FRICTION_S);
     }
 
     public Vector2 getPosition() {
@@ -128,8 +128,8 @@ public class Kart {
         } else {
             rotation += DRIFTING_SPEED*deltaTime*(dir == Direction.LEFT ? 1 : -1);
             rotation = (rotation % 360 + 360) % 360;
-            pBody.applyForceToCenter(new Vector2(15f, -2f).rotate(rotation+90*(dir == Direction.LEFT ? -1 : 1)), true);
-            //pBody.setLinearDamping(0.9f);
+            pBody.applyForceToCenter(new Vector2(10f, -2f).rotate(rotation+90*(dir == Direction.LEFT ? -1 : 1)), true);
+            pBody.setLinearDamping(FRICTION_S*0.9f);
             //friction = 70f;
         }
     }

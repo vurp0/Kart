@@ -61,6 +61,16 @@ public class KartScreen implements Screen {
 
 		gameWorld = new World(Vector2.Zero, true);
 
+		BodyDef worldBodyDef = new BodyDef();
+		worldBodyDef.type = BodyDef.BodyType.StaticBody;
+		worldBodyDef.position.set(0,0);
+		PolygonShape shape = new PolygonShape();
+		shape.set(new Vector2[]{new Vector2(-49,-50), new Vector2(-50, -50), new Vector2(-50, 50), new Vector2(-49, 50)});
+		//FixtureDef fixtureDef = new FixtureDef();
+		//fixtureDef.shape = shape;
+		Body worldBody = gameWorld.createBody(worldBodyDef);
+		worldBody.createFixture(shape, 1);
+
 		//spriteBatch = new SpriteBatch();
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		groundTexture = new Texture("ground2.png");
