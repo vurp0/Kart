@@ -9,14 +9,11 @@ import com.badlogic.gdx.physics.box2d.*;
  */
 public class Kart {
     public enum Direction{LEFT, RIGHT}
-    float TOP_SPEED;                    //per second
-    static float TURNING_SPEED = 60f;   //per second
-    static float DRIFTING_SPEED = 75f;
-    static float MASS = 1f;             //kilograms
-    static float ENGINE_FORCE = 150f;  //newtons, completely realistic
+    static float TURNING_SPEED = 80f;   //TWEAK THESE PROPERTIES
+    static float DRIFTING_SPEED = 95f;
+    static float MASS = 1f;
+    static float ENGINE_FORCE = 350f;
     static float FRICTION_S = 2f;
-
-    float friction = 60f;         //coefficient of friction
 
     Body pBody;
 
@@ -30,8 +27,7 @@ public class Kart {
     Vector2 brakeForce;
 
 
-    public Kart(float topSpeed, Vector2 position, float rotation, World world) {
-        TOP_SPEED = topSpeed;
+    public Kart(Vector2 position, float rotation, World world) {
         this.position = position;
         this.rotation = rotation;
         velocity = new Vector2();
@@ -46,7 +42,7 @@ public class Kart {
         shape.setAsBox(0.5f, 0.5f);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 5f;
+        fixtureDef.density = 10f;
         fixtureDef.restitution = 1f;
         pBody.setLinearDamping(FRICTION_S);
         //pBody.setAngularDamping(10f);
@@ -106,31 +102,22 @@ public class Kart {
 
     public void brake() {
         pBody.applyForceToCenter(pBody.getLinearVelocity().cpy().rotate(180).scl(1.5f).add(new Vector2(-35f, 0).rotate(rotation)), true);
-        //brakeForce.set(120f*velocity.len()-350f,0);
-        //brakeForce.setAngle((rotation-180f)%360);
     }
 
     public void stopBraking() {
         brakeForce.setLength(0);
     }
 
-    public void turn(Direction dir, float deltaTime, boolean drift) {
-        //engineForce.setAngle(engineForce.angle()+10*(dir == Direction.LEFT ? -1 : 1));
-        //engineForce.set(engineForce.x, engineForce.x*(dir == Direction.LEFT ? -1 : 1));
-        //acceleration.setAngle(acceleration.angle()+TURNING_SPEED*deltaTime*(dir == Direction.LEFT ? -1 : 1));
+    public void turn(float amount, float deltaTime, boolean drift) {
 
         if (!drift) {
-            //pBody.applyTorque(TURNING_SPEED*(dir == Direction.LEFT ? 1 : -1), true);
-
-            rotation += TURNING_SPEED*deltaTime*(dir == Direction.LEFT ? 1 : -1);
+            rotation += TURNING_SPEED*amount*deltaTime/**(dir == Direction.LEFT ? 1 : -1)*/;
             rotation = (rotation % 360 + 360) % 360;
-            friction = 140f;
         } else {
-            rotation += DRIFTING_SPEED*deltaTime*(dir == Direction.LEFT ? 1 : -1);
+            rotation += DRIFTING_SPEED*amount*deltaTime/**(dir == Direction.LEFT ? 1 : -1)*/;
             rotation = (rotation % 360 + 360) % 360;
-            pBody.applyForceToCenter(new Vector2(10f, -2f).rotate(rotation+90*(dir == Direction.LEFT ? -1 : 1)), true);
-            pBody.setLinearDamping(FRICTION_S*0.9f);
-            //friction = 70f;
+            pBody.applyForceToCenter(new Vector2(9f*amount, -2f).rotate(rotation+90/**(dir == Direction.LEFT ? -1 : 1)*/), true);
+            pBody.setLinearDamping(FRICTION_S*0.8f);
         }
     }
 

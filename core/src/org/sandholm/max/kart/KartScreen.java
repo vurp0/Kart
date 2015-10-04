@@ -1,6 +1,7 @@
 package org.sandholm.max.kart;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.controllers.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -21,7 +22,7 @@ public class KartScreen implements Screen {
 	World gameWorld;
 
 
-	static float CAMERA_HEIGHT = 3f;
+	static float CAMERA_HEIGHT = 4f;
 
 	float stateTime = 0f;
 
@@ -38,6 +39,7 @@ public class KartScreen implements Screen {
 	ArrayList<Decal> otherKartDecal;
 
     MyInputProcessor inputProcessor;
+	Controller playerController;
 
 	Kart playerKart;
 	ArrayList<Kart> otherKarts;
@@ -65,10 +67,14 @@ public class KartScreen implements Screen {
 		worldBodyDef.type = BodyDef.BodyType.StaticBody;
 		worldBodyDef.position.set(0,0);
 		PolygonShape shape = new PolygonShape();
-		shape.set(new Vector2[]{new Vector2(-49,-50), new Vector2(-50, -50), new Vector2(-50, 50), new Vector2(-49, 50)});
-		//FixtureDef fixtureDef = new FixtureDef();
-		//fixtureDef.shape = shape;
 		Body worldBody = gameWorld.createBody(worldBodyDef);
+		shape.set(new Vector2[]{new Vector2(-63,-64), new Vector2(-64, -64), new Vector2(-64, 64), new Vector2(-63, 64)});
+		worldBody.createFixture(shape, 1);
+		shape.set(new Vector2[]{new Vector2(-64,-64), new Vector2(64,-64), new Vector2(64,-63), new Vector2(-64,-63)});
+		worldBody.createFixture(shape, 1);
+		shape.set(new Vector2[]{new Vector2(-64, 64), new Vector2(64, 64), new Vector2(64, 63), new Vector2(-64, 63)});
+		worldBody.createFixture(shape, 1);
+		shape.set(new Vector2[]{new Vector2(63,-64), new Vector2(64, -64), new Vector2(64, 64), new Vector2(63, 64)});
 		worldBody.createFixture(shape, 1);
 
 		//spriteBatch = new SpriteBatch();
@@ -83,19 +89,23 @@ public class KartScreen implements Screen {
 			kartTextureRegions[i] = new TextureRegion(kartTextureSheet, (22-i)*32+32, 0, -32, 32);
 		}
 
-		groundDecal = Decal.newDecal(100, 100, new TextureRegion(groundTexture));
-		kartDecal = Decal.newDecal(1, 1f, kartTextureRegions[0], true);
+		groundDecal = Decal.newDecal(128, 128, new TextureRegion(groundTexture));
+		kartDecal = Decal.newDecal(1.28f, 1.28f, kartTextureRegions[0], true);
 
-		playerKart = new Kart(100f, new Vector2(0, 0), 0, gameWorld);
+		playerKart = new Kart(new Vector2(0, 0), 0, gameWorld);
 
 		otherKarts = new ArrayList<Kart>();
 		otherKartDecal = new ArrayList<Decal>();
 
-		for (int i = 0; i < 50; i++) {
-			otherKarts.add(new Kart(0f, new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
+		for (int i = 0; i < 20; i++) {
+			otherKarts.add(new Kart(new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
 		}
-		for (int i = 0; i < 50; i++) {
-			otherKartDecal.add(Decal.newDecal(1, 1f, kartTextureRegions[0], true));
+		for (int i = 0; i < otherKarts.size(); i++) {
+			otherKartDecal.add(Decal.newDecal(1.28f, 1.28f, kartTextureRegions[0], true));
+		}
+
+		if (Controllers.getControllers().size >= 1) {
+			playerController = Controllers.getControllers().first();
 		}
 
 		//inputProcessor = new MyInputProcessor();
@@ -117,32 +127,41 @@ public class KartScreen implements Screen {
         //float deltaTime = Gdx.graphics.getDeltaTime();
 		stateTime += deltaTime;
 
-		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+		/*if (Gdx.input.isKeyPressed(Input.Keys.S)) {
 			playerKart.brake();
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+		}*/
+		/*if (Gdx.input.isKeyPressed(Input.Keys.A)) {
             playerKart.turn(Kart.Direction.LEFT, deltaTime, false);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             playerKart.turn(Kart.Direction.RIGHT, deltaTime, false);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
-			playerKart.turn(Kart.Direction.LEFT, deltaTime, true);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
-			playerKart.turn(Kart.Direction.RIGHT, deltaTime, true);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+		}*/
+
+		playerKart.turn((Math.abs(playerController.getAxis(0)) > 0.1f ? -playerController.getAxis(0) : 0), deltaTime, playerController.getButton(5));
+		if (playerController.getButton(1)){
 			playerKart.accelerate();
 		}
+		if (playerController.getButton(2)){
+			playerKart.brake();
+		}
+
+		/*if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+			playerKart.turn(Kart.Direction.LEFT, 1, deltaTime, true);
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+			playerKart.turn(Kart.Direction.RIGHT, 1, deltaTime, true);
+		}*/
+		/*if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+			playerKart.accelerate();
+		}*/
 
 		playerKart.update(deltaTime);
 
 		gameWorld.step(deltaTime, 6, 2);
 
-		cameraAngle = MathUtils.radiansToDegrees*MathUtils.lerpAngle(MathUtils.degreesToRadians*cameraAngle, MathUtils.degreesToRadians*playerKart.getRotation(), 0.05f);
+		cameraAngle = MathUtils.radiansToDegrees*MathUtils.lerpAngle(MathUtils.degreesToRadians*cameraAngle, MathUtils.degreesToRadians*playerKart.getRotation(), 0.04f);
 
-		camera.position.set(new Vector3(playerKart.getPosition(), 0).add(-7f, 0f, CAMERA_HEIGHT));
+		camera.position.set(new Vector3(playerKart.getPosition(), 0).add(-8f, 0f, CAMERA_HEIGHT));
 		camera.up.set(0f, 0f, 1f);
 		camera.rotateAround(new Vector3(playerKart.getPosition(), 0), new Vector3(0f, 0f, 1f), cameraAngle);
 		camera.lookAt(new Vector3(playerKart.getPosition(), CAMERA_HEIGHT - 1.5f));
@@ -153,20 +172,20 @@ public class KartScreen implements Screen {
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 		decalBatch.add(groundDecal);
 		kartDecal.setTextureRegion(kartTextureRegions[degreesToFrame(cameraAngle - playerKart.getRotation(), 22)]);
-		kartDecal.setPosition(playerKart.getPosition().x, playerKart.getPosition().y, 0.5f);
+		kartDecal.setPosition(playerKart.getPosition().x, playerKart.getPosition().y, kartDecal.getHeight()/2);
 		kartDecal.setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
 
 
 		decalBatch.add(kartDecal);
-		for (int i=0; i<50; i++) {
+		for (int i=0; i<otherKarts.size(); i++) {
 			otherKarts.get(i).accelerate();
-			otherKarts.get(i).turn(Kart.Direction.LEFT, deltaTime, false);
+			otherKarts.get(i).turn(-1, deltaTime, false);
 			otherKarts.get(i).update(deltaTime);
 			otherKarts.get(i).stopAccelerating();
 			otherKarts.get(i).stopBraking();
 
 			otherKartDecal.get(i).setTextureRegion(kartTextureRegions[degreesToFrame(cameraAngle - otherKarts.get(i).getRotation(), 22)]);
-			otherKartDecal.get(i).setPosition(otherKarts.get(i).getPosition().x, otherKarts.get(i).getPosition().y, 0.5f);
+			otherKartDecal.get(i).setPosition(otherKarts.get(i).getPosition().x, otherKarts.get(i).getPosition().y, kartDecal.getHeight()/2);
 			otherKartDecal.get(i).setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
 			decalBatch.add(otherKartDecal.get(i));
 		}
