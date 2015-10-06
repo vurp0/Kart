@@ -104,9 +104,9 @@ public class KartScreen implements Screen {
 			otherKartDecal.add(Decal.newDecal(1.28f, 1.28f, kartTextureRegions[0], true));
 		}
 
-		if (Controllers.getControllers().size >= 1) {
-			playerController = Controllers.getControllers().first();
-		}
+		//if (Controllers.getControllers().size >= 1) {
+			//playerController = Controllers.getControllers().first();
+		//}
 
 		//inputProcessor = new MyInputProcessor();
 		//Gdx.input.setInputProcessor(inputProcessor);
@@ -127,32 +127,31 @@ public class KartScreen implements Screen {
         //float deltaTime = Gdx.graphics.getDeltaTime();
 		stateTime += deltaTime;
 
-		/*if (Gdx.input.isKeyPressed(Input.Keys.S)) {
+		if (Gdx.input.isKeyPressed(Input.Keys.S)) {
 			playerKart.brake();
-		}*/
-		/*if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            playerKart.turn(Kart.Direction.LEFT, deltaTime, false);
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
+            playerKart.turn(1, deltaTime, false);
 		}
 		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            playerKart.turn(Kart.Direction.RIGHT, deltaTime, false);
-		}*/
+            playerKart.turn(-1, deltaTime, false);
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
+			playerKart.turn(1, deltaTime, true);
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
+			playerKart.turn(-1, deltaTime, true);
+		}
+		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
+			playerKart.accelerate();
+		}
 
-		playerKart.turn((Math.abs(playerController.getAxis(0)) > 0.1f ? -playerController.getAxis(0) : 0), deltaTime, playerController.getButton(5));
+		/*playerKart.turn((Math.abs(playerController.getAxis(0)) > 0.1f ? -playerController.getAxis(0) : 0), deltaTime, playerController.getButton(5));
 		if (playerController.getButton(1)){
 			playerKart.accelerate();
 		}
 		if (playerController.getButton(2)){
 			playerKart.brake();
-		}
-
-		/*if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
-			playerKart.turn(Kart.Direction.LEFT, 1, deltaTime, true);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
-			playerKart.turn(Kart.Direction.RIGHT, 1, deltaTime, true);
-		}*/
-		/*if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			playerKart.accelerate();
 		}*/
 
 		playerKart.update(deltaTime);

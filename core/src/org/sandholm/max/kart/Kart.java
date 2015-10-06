@@ -49,10 +49,10 @@ public class Kart {
         Fixture fixture = pBody.createFixture(fixtureDef);
         shape.dispose();
 
-        acceleration = new Vector2();
+        /*acceleration = new Vector2();
         engineForce = new Vector2();
         frictionForce = new Vector2();
-        brakeForce = new Vector2();
+        brakeForce = new Vector2();*/
     }
 
     public void update(float deltaTime) {
@@ -96,8 +96,8 @@ public class Kart {
     }
 
     public void stopAccelerating() {
-        engineForce.setLength(0);
-        engineForce.setAngle(0);
+        /*engineForce.setLength(0);
+        engineForce.setAngle(0);*/
     }
 
     public void brake() {
@@ -105,7 +105,7 @@ public class Kart {
     }
 
     public void stopBraking() {
-        brakeForce.setLength(0);
+        /*brakeForce.setLength(0);*/
     }
 
     public void turn(float amount, float deltaTime, boolean drift) {
