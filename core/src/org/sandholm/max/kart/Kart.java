@@ -9,8 +9,8 @@ import com.badlogic.gdx.physics.box2d.*;
  */
 public class Kart {
     public enum Direction{LEFT, RIGHT}
-    static float TURNING_SPEED = 80f;   //TWEAK THESE PROPERTIES
-    static float DRIFTING_SPEED = 95f;
+    static float TURNING_SPEED = 70f;   //TWEAK THESE PROPERTIES
+    static float DRIFTING_SPEED = 80f;
     static float MASS = 1f;
     static float ENGINE_FORCE = 350f;
     static float FRICTION_S = 2f;
