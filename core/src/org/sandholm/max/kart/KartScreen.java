@@ -40,8 +40,10 @@ public class KartScreen implements Screen {
 	Decal kartDecal;
 	ArrayList<Decal> otherKartDecal;
 
-    MyInputProcessor inputProcessor;
-	Controller playerController;
+    //MyInputProcessor inputProcessor;
+	//Controller playerController;
+
+	GameController playerController;
 
 	Kart playerKart;
 	ArrayList<Kart> otherKarts;
@@ -108,9 +110,10 @@ public class KartScreen implements Screen {
 			otherKartDecal.add(Decal.newDecal(1.28f, 1.28f, kartTextureRegions[0], true));
 		}
 
-		if (Controllers.getControllers().size >= 1) {
+		/*if (Controllers.getControllers().size >= 1) {
 			playerController = Controllers.getControllers().first();
-		}
+		}*/
+		playerController = new KeyboardController();
 
 		//inputProcessor = new MyInputProcessor();
 		//Gdx.input.setInputProcessor(inputProcessor);
@@ -150,11 +153,11 @@ public class KartScreen implements Screen {
 			playerKart.accelerate();
 		}*/
 
-		playerKart.turn((Math.abs(playerController.getAxis(0)) > 0.1f ? -playerController.getAxis(0) : 0), deltaTime, playerController.getButton(5));
-		if (playerController.getButton(1)){
+		playerKart.turn((Math.abs(playerController.getTurning()) > 0.1f ? -playerController.getTurning() : 0), deltaTime, playerController.getDrifting());
+		if (playerController.getAccelerator() > 0.5f){ //TODO: do something that makes sense instead of this crap
 			playerKart.accelerate();
 		}
-		if (playerController.getButton(2)){
+		if (playerController.getBraking() > 0.5f){ // -//-
 			playerKart.brake();
 		}
 
