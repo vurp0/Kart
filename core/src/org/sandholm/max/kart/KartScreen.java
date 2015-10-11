@@ -1,6 +1,7 @@
 package org.sandholm.max.kart;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -41,6 +42,7 @@ public class KartScreen implements Screen {
 
 	Kart playerKart;
 	ArrayList<Kart> otherKarts;
+	DumbAIGameController otherKartController;
 
 	public KartScreen(KartGame game) {
 		this.game = game;
@@ -80,24 +82,28 @@ public class KartScreen implements Screen {
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		groundTexture = level.getGroundTexture();
 
-		groundDecal = Decal.newDecal(level.getGroundTexture().getWidth()/level.getScale(), level.getGroundTexture().getHeight()/level.getScale(), new TextureRegion(groundTexture));
+		groundDecal = Decal.newDecal(level.getGroundTexture().getWidth() / level.getScale(), level.getGroundTexture().getHeight() / level.getScale(), new TextureRegion(groundTexture));
 
 
 		playerKart = new Kart("mario", level.getSpawnPoint().cpy(), level.getSpawnRotation(), gameWorld);
 		kartDecal = Decal.newDecal(1.28f, 1.28f, playerKart.getTextureRegionFromAngle(playerKart.getRotation()), true);
+		playerKart.setController(new ControllerGameController(Controllers.getControllers().first()));
 
 		otherKarts = new ArrayList<Kart>();
 		otherKartDecal = new ArrayList<Decal>();
+		otherKartController = new DumbAIGameController();
 
 		for (int i = 0; i < 20; i++) {
 			otherKarts.add(new Kart("mario", new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
+			otherKarts.get(i).setController(otherKartController);
 		}
 		//for (int i = 0; i < otherKarts.size(); i++) {
 		for (Kart k : otherKarts) {
 			otherKartDecal.add(Decal.newDecal(1.28f, 1.28f, k.getTextureRegionFromAngle(k.getRotation()), true));
 		}
 
-		playerController = new KeyboardController();
+		//playerController = new KeyboardGameController();
+		//playerController = new ControllerGameController(Controllers.getControllers().first());
 
 		//inputProcessor = new MyInputProcessor();
 		//Gdx.input.setInputProcessor(inputProcessor);
@@ -117,13 +123,13 @@ public class KartScreen implements Screen {
 	public void render(float deltaTime) {
 		stateTime += deltaTime;
 
-		playerKart.turn((Math.abs(playerController.getTurning()) > 0.1f ? -playerController.getTurning() : 0), deltaTime, playerController.getDrifting());
+		/*playerKart.turn((Math.abs(playerController.getTurning()) > 0.1f ? -playerController.getTurning() : 0), deltaTime, playerController.getDrifting());
 		if (playerController.getAccelerator() > 0.5f){ //TODO: do something that makes sense instead of this crap
 			playerKart.accelerate();
 		}
 		if (playerController.getBraking() > 0.5f){ // -//-
 			playerKart.brake();
-		}
+		}*/
 
 		playerKart.update(deltaTime);
 
@@ -148,11 +154,7 @@ public class KartScreen implements Screen {
 
 		decalBatch.add(kartDecal);
 		for (int i=0; i<otherKarts.size(); i++) {
-			otherKarts.get(i).accelerate();
-			otherKarts.get(i).turn(-1, deltaTime, false);
 			otherKarts.get(i).update(deltaTime);
-			otherKarts.get(i).stopAccelerating();
-			otherKarts.get(i).stopBraking();
 
 			otherKartDecal.get(i).setTextureRegion(otherKarts.get(i).getTextureRegionFromAngle(cameraAngle - otherKarts.get(i).getRotation()));
 			otherKartDecal.get(i).setPosition(otherKarts.get(i).getPosition().x, otherKarts.get(i).getPosition().y, kartDecal.getHeight()/2);

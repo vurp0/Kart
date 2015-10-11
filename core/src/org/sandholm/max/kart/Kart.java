@@ -25,6 +25,8 @@ public class Kart {
 
     Body pBody;
 
+    GameController controller;
+
     Vector2 position;
     float rotation;
 
@@ -72,12 +74,26 @@ public class Kart {
     }
 
     public void update(float deltaTime) {
+        if (controller != null) {
+            turn((Math.abs(controller.getTurning()) > 0.1f ? controller.getTurning() : 0), deltaTime, controller.getDrifting());
+            if (controller.getAccelerator() > 0.5f) { //TODO: do something that makes sense instead of this crap
+                accelerate();
+            }
+            if (controller.getBraking() > 0.5f) { // -//-
+                brake();
+            }
+        }
+
         position.set(pBody.getPosition());
         pBody.setTransform(pBody.getPosition(), rotation*MathUtils.degreesToRadians);
     }
 
     public void resetFrame() {
         pBody.setLinearDamping(FRICTION_S);
+    }
+
+    public void setController(GameController controller) {
+        this.controller = controller;
     }
 
     public Vector2 getPosition() {

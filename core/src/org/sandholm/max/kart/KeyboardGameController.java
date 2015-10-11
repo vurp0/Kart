@@ -6,13 +6,13 @@ import com.badlogic.gdx.Input;
 /**
  * GameController that reads input from keyboard to control a Kart
  */
-public class KeyboardController implements GameController {
+public class KeyboardGameController implements GameController {
     @Override
     public float getTurning() {
         if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            return -1;
-        } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
             return 1;
+        } else if (Gdx.input.isKeyPressed(Input.Keys.D)) {
+            return -1;
         } else {
             return 0;
         }
