@@ -95,16 +95,16 @@ public class KartScreen implements Screen {
 			kartTextureRegions[i] = new TextureRegion(kartTextureSheet, (22-i)*32+32, 0, -32, 32);
 		}
 
-		groundDecal = Decal.newDecal(128, 128, new TextureRegion(groundTexture));
+		groundDecal = Decal.newDecal(level.getGroundTexture().getWidth()/level.getScale(), level.getGroundTexture().getHeight()/level.getScale(), new TextureRegion(groundTexture));
 		kartDecal = Decal.newDecal(1.28f, 1.28f, kartTextureRegions[0], true);
 
-		playerKart = new Kart(level.getSpawnPoint().cpy(), level.getSpawnRotation(), gameWorld);
+		playerKart = new Kart("mario", level.getSpawnPoint().cpy(), level.getSpawnRotation(), gameWorld);
 
 		otherKarts = new ArrayList<Kart>();
 		otherKartDecal = new ArrayList<Decal>();
 
 		for (int i = 0; i < 20; i++) {
-			otherKarts.add(new Kart(new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
+			otherKarts.add(new Kart("mario", new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
 		}
 		for (int i = 0; i < otherKarts.size(); i++) {
 			otherKartDecal.add(Decal.newDecal(1.28f, 1.28f, kartTextureRegions[0], true));

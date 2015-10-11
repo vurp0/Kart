@@ -13,20 +13,22 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 /**
- * Created by max on 5.10.2015.
+ * Defines a level (track) with a spawn point, ground texture, etc.
  */
 public class Level {
     Texture groundTexture;
     Vector2 spawnPoint;
     float spawnRotation;
+    float scale; //pixels per meter
 
     public Level(String levelName) {
         try {
             JSONParser parser = new JSONParser();
-            Map obj = (Map)parser.parse(new FileReader(levelName+"/level.json"));
+            Map obj = (Map)parser.parse(new FileReader("levels/"+levelName+"/level.json"));
             spawnPoint = new Vector2(((Number)((Map)obj.get("spawn")).get("x")).floatValue(), ((Number)(((Map)obj.get("spawn")).get("y"))).floatValue());
             spawnRotation = ((Number)((Map)obj.get("spawn")).get("angle")).floatValue();
-            groundTexture = new Texture(levelName+obj.get("ground"));
+            scale = ((Number)obj.get("scale")).floatValue();
+            groundTexture = new Texture("levels/"+levelName+"/"+obj.get("ground"));
             
         } catch(Exception e) {
             e.printStackTrace();
@@ -39,4 +41,7 @@ public class Level {
 
     public Texture getGroundTexture() {return groundTexture;}
 
+    public float getScale() {
+        return scale;
+    }
 }
