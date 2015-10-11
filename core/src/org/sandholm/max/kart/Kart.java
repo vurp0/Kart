@@ -1,6 +1,7 @@
 package org.sandholm.max.kart;
 
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -9,14 +10,7 @@ import org.json.simple.parser.JSONParser;
 import java.io.FileReader;
 import java.util.Map;
 
-/**
- * Kart physics class
- */
 public class Kart {
-    /*static float TURNING_SPEED = 70f;   //TWEAK THESE PROPERTIES
-    static float DRIFTING_SPEED = 80f;
-    static float MASS = 1f;
-    static float ENGINE_FORCE = 350f;*/
     static float FRICTION_S = 2f;
 
     float turningSpeed;
@@ -25,6 +19,9 @@ public class Kart {
     float width;
     float length;
     float density;
+
+    Texture spriteSheet;
+    TextureRegion[] kartSprites;
 
     Body pBody;
 
@@ -41,6 +38,14 @@ public class Kart {
             width = ((Number)obj.get("width")).floatValue();
             length = ((Number)obj.get("length")).floatValue();
             density = ((Number)obj.get("density")).floatValue();
+            spriteSheet = new Texture("karts/"+obj.get("sprites"));
+            kartSprites = new TextureRegion[22];
+            for (int i=0; i<=11; i++){  //make TextureRegions from the normal sprites
+                kartSprites[i] = new TextureRegion(spriteSheet, i*32, 0, 32, 32);
+            }
+            for (int i=12; i<=21; i++){ //make TextureRegions from the sprites flipped to make the complete circle
+                kartSprites[i] = new TextureRegion(spriteSheet, (22-i)*32+32, 0, -32, 32);
+            }
 
         } catch(Exception e) {
             e.printStackTrace();
@@ -59,11 +64,10 @@ public class Kart {
         shape.setAsBox(length, width);
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = shape;
-        fixtureDef.density = 10f;
+        fixtureDef.density = density;
         fixtureDef.restitution = 1f;
         pBody.setLinearDamping(FRICTION_S);
-        //pBody.setAngularDamping(10f);
-        Fixture fixture = pBody.createFixture(fixtureDef);
+        pBody.createFixture(fixtureDef);
         shape.dispose();
     }
 
@@ -82,6 +86,10 @@ public class Kart {
 
     public float getRotation() {
         return rotation;
+    }
+
+    public TextureRegion getTextureRegionFromAngle(float angle) {
+        return kartSprites[(((int)Math.floor((angle+360/(kartSprites.length*2))/(360/kartSprites.length))) % kartSprites.length + kartSprites.length ) % kartSprites.length];
     }
 
     public void accelerate() {

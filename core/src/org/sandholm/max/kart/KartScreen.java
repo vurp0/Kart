@@ -1,7 +1,6 @@
 package org.sandholm.max.kart;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.controllers.*;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -28,8 +27,6 @@ public class KartScreen implements Screen {
 
 	DecalBatch decalBatch;
 	Texture groundTexture;
-	Texture kartTextureSheet;
-	TextureRegion[] kartTextureRegions;
 	PerspectiveCamera camera;
 
 	Level level;
@@ -39,9 +36,6 @@ public class KartScreen implements Screen {
 	Decal groundDecal;
 	Decal kartDecal;
 	ArrayList<Decal> otherKartDecal;
-
-    //MyInputProcessor inputProcessor;
-	//Controller playerController;
 
 	GameController playerController;
 
@@ -74,31 +68,23 @@ public class KartScreen implements Screen {
 		worldBodyDef.position.set(0,0);
 		PolygonShape shape = new PolygonShape();
 		Body worldBody = gameWorld.createBody(worldBodyDef);
-		shape.set(new Vector2[]{new Vector2(-63,-64), new Vector2(-64, -64), new Vector2(-64, 64), new Vector2(-63, 64)});
+		shape.set(new Vector2[]{new Vector2(-63, -64), new Vector2(-64, -64), new Vector2(-64, 64), new Vector2(-63, 64)});
 		worldBody.createFixture(shape, 1);
-		shape.set(new Vector2[]{new Vector2(-64,-64), new Vector2(64,-64), new Vector2(64,-63), new Vector2(-64,-63)});
+		shape.set(new Vector2[]{new Vector2(-64, -64), new Vector2(64, -64), new Vector2(64, -63), new Vector2(-64, -63)});
 		worldBody.createFixture(shape, 1);
 		shape.set(new Vector2[]{new Vector2(-64, 64), new Vector2(64, 64), new Vector2(64, 63), new Vector2(-64, 63)});
 		worldBody.createFixture(shape, 1);
-		shape.set(new Vector2[]{new Vector2(63,-64), new Vector2(64, -64), new Vector2(64, 64), new Vector2(63, 64)});
+		shape.set(new Vector2[]{new Vector2(63, -64), new Vector2(64, -64), new Vector2(64, 64), new Vector2(63, 64)});
 		worldBody.createFixture(shape, 1);
 
-		//spriteBatch = new SpriteBatch();
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		groundTexture = level.getGroundTexture();
-		kartTextureSheet = new Texture("mario.png");
-		kartTextureRegions = new TextureRegion[22];
-		for (int i=0; i<=11; i++){  //make TextureRegions from the normal sprites
-			kartTextureRegions[i] = new TextureRegion(kartTextureSheet, i*32, 0, 32, 32);
-		}
-		for (int i=12; i<=21; i++){ //make TextureRegions from the sprites flipped to make the complete circle
-			kartTextureRegions[i] = new TextureRegion(kartTextureSheet, (22-i)*32+32, 0, -32, 32);
-		}
 
 		groundDecal = Decal.newDecal(level.getGroundTexture().getWidth()/level.getScale(), level.getGroundTexture().getHeight()/level.getScale(), new TextureRegion(groundTexture));
-		kartDecal = Decal.newDecal(1.28f, 1.28f, kartTextureRegions[0], true);
+
 
 		playerKart = new Kart("mario", level.getSpawnPoint().cpy(), level.getSpawnRotation(), gameWorld);
+		kartDecal = Decal.newDecal(1.28f, 1.28f, playerKart.getTextureRegionFromAngle(playerKart.getRotation()), true);
 
 		otherKarts = new ArrayList<Kart>();
 		otherKartDecal = new ArrayList<Decal>();
@@ -106,13 +92,11 @@ public class KartScreen implements Screen {
 		for (int i = 0; i < 20; i++) {
 			otherKarts.add(new Kart("mario", new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
 		}
-		for (int i = 0; i < otherKarts.size(); i++) {
-			otherKartDecal.add(Decal.newDecal(1.28f, 1.28f, kartTextureRegions[0], true));
+		//for (int i = 0; i < otherKarts.size(); i++) {
+		for (Kart k : otherKarts) {
+			otherKartDecal.add(Decal.newDecal(1.28f, 1.28f, k.getTextureRegionFromAngle(k.getRotation()), true));
 		}
 
-		/*if (Controllers.getControllers().size >= 1) {
-			playerController = Controllers.getControllers().first();
-		}*/
 		playerController = new KeyboardController();
 
 		//inputProcessor = new MyInputProcessor();
@@ -124,34 +108,14 @@ public class KartScreen implements Screen {
 
 	}
 
-	int degreesToFrame(float angle, int range) {
+	//TODO: this method could still be useful some day, and I should probably put it somewhere as a generic utility method
+	/*static int degreesToFrame(float angle, int range) {
 		return (((int)Math.floor((angle+360/(range*2))/(360/range))) % range + range ) % range;
-	}
+	}*/
 
 	@Override
 	public void render(float deltaTime) {
-
-        //float deltaTime = Gdx.graphics.getDeltaTime();
 		stateTime += deltaTime;
-
-		/*if (Gdx.input.isKeyPressed(Input.Keys.S)) {
-			playerKart.brake();
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.A)) {
-            playerKart.turn(1, deltaTime, false);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.D)) {
-            playerKart.turn(-1, deltaTime, false);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.Q)) {
-			playerKart.turn(1, deltaTime, true);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.E)) {
-			playerKart.turn(-1, deltaTime, true);
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.W)) {
-			playerKart.accelerate();
-		}*/
 
 		playerKart.turn((Math.abs(playerController.getTurning()) > 0.1f ? -playerController.getTurning() : 0), deltaTime, playerController.getDrifting());
 		if (playerController.getAccelerator() > 0.5f){ //TODO: do something that makes sense instead of this crap
@@ -165,7 +129,6 @@ public class KartScreen implements Screen {
 
 		gameWorld.step(deltaTime, 6, 2);
 
-		//cameraAngle = playerKart.getRotation();
 		cameraAngle = MathUtils.radiansToDegrees*MathUtils.lerpAngle(MathUtils.degreesToRadians*cameraAngle, MathUtils.degreesToRadians*playerKart.getRotation(), 0.06f);
 
 		camera.position.set(new Vector3(playerKart.getPosition(), 0).add(-8f, 0f, CAMERA_HEIGHT));
@@ -178,7 +141,7 @@ public class KartScreen implements Screen {
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 		decalBatch.add(groundDecal);
-		kartDecal.setTextureRegion(kartTextureRegions[degreesToFrame(cameraAngle - playerKart.getRotation(), 22)]);
+		kartDecal.setTextureRegion(playerKart.getTextureRegionFromAngle(cameraAngle - playerKart.getRotation()));
 		kartDecal.setPosition(playerKart.getPosition().x, playerKart.getPosition().y, kartDecal.getHeight()/2);
 		kartDecal.setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
 
@@ -191,7 +154,7 @@ public class KartScreen implements Screen {
 			otherKarts.get(i).stopAccelerating();
 			otherKarts.get(i).stopBraking();
 
-			otherKartDecal.get(i).setTextureRegion(kartTextureRegions[degreesToFrame(cameraAngle - otherKarts.get(i).getRotation(), 22)]);
+			otherKartDecal.get(i).setTextureRegion(otherKarts.get(i).getTextureRegionFromAngle(cameraAngle - otherKarts.get(i).getRotation()));
 			otherKartDecal.get(i).setPosition(otherKarts.get(i).getPosition().x, otherKarts.get(i).getPosition().y, kartDecal.getHeight()/2);
 			otherKartDecal.get(i).setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
 			decalBatch.add(otherKartDecal.get(i));

@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 
 /**
- * Created by max on 8.10.2015.
+ * GameController that reads input from keyboard to control a Kart
  */
 public class KeyboardController implements GameController {
     @Override

@@ -1,14 +1,14 @@
 package org.sandholm.max.kart;
 
 /**
- * Created by max on 8.10.2015.
+ * Interface for controllers that control a kart, to be implemented by a class that reads input from e.g. keyboard or gamepads etc.
  */
 public interface GameController {
-    public float getTurning();
+    float getTurning();
 
-    public float getAccelerator();
+    float getAccelerator();
 
-    public float getBraking();
+    float getBraking();
 
-    public boolean getDrifting();
+    boolean getDrifting();
 }

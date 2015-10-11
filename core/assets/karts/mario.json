@@ -5,5 +5,6 @@
   "turningSpeed":70,
   "driftingSpeed":80,
   "width":0.5,
-  "length":0.5
+  "length":0.5,
+  "sprites":"mario.png"
 }
