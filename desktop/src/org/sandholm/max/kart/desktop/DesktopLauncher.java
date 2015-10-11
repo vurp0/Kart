@@ -19,12 +19,12 @@ public class DesktopLauncher {
 		 * for 32-bit Linux, so on my laptop I have to use LWJGL instead.
 		 */
 
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
-		//JglfwApplicationConfiguration config = new JglfwApplicationConfiguration();
+		//LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		JglfwApplicationConfiguration config = new JglfwApplicationConfiguration();
 		config.forceExit = false;
 		config.height = 480;
 		config.width = 800;
-		new LwjglApplication(new KartGame(), config);
-		//new JglfwApplication(new KartGame(), config);
+		//new LwjglApplication(new KartGame(), config);
+		new JglfwApplication(new KartGame(), config);
 	}
 }

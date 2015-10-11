@@ -87,7 +87,8 @@ public class KartScreen implements Screen {
 
 		playerKart = new Kart("mario", level.getSpawnPoint().cpy(), level.getSpawnRotation(), gameWorld);
 		kartDecal = Decal.newDecal(1.28f, 1.28f, playerKart.getTextureRegionFromAngle(playerKart.getRotation()), true);
-		playerKart.setController(new ControllerGameController(Controllers.getControllers().first()));
+		//playerKart.setController(new ControllerGameController(Controllers.getControllers().first()));
+		playerKart.setController(new KeyboardGameController());
 
 		otherKarts = new ArrayList<Kart>();
 		otherKartDecal = new ArrayList<Decal>();
@@ -97,7 +98,10 @@ public class KartScreen implements Screen {
 			otherKarts.add(new Kart("mario", new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
 			otherKarts.get(i).setController(otherKartController);
 		}
-		//for (int i = 0; i < otherKarts.size(); i++) {
+		for (int i = 20; i < 40; i++) {
+			otherKarts.add(new Kart("tux", new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld));
+			otherKarts.get(i).setController(otherKartController);
+		}
 		for (Kart k : otherKarts) {
 			otherKartDecal.add(Decal.newDecal(1.28f, 1.28f, k.getTextureRegionFromAngle(k.getRotation()), true));
 		}
