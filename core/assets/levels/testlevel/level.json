@@ -1,0 +1,10 @@
+{
+	"name":"Testing Level",
+	"spawn":{
+		"x":40,
+		"y":40,
+		"angle":45
+		},
+	"scale":8,
+	"ground":"ground.png"
+}
