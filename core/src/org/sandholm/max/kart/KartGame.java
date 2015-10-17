@@ -8,10 +8,12 @@ import com.badlogic.gdx.Game;
  */
 public class KartGame extends Game {
     KartScreen kartScreen;
+    GameControllerSelectScreen gameControllerSelectScreen;
 
     @Override
     public void create() {
         kartScreen = new KartScreen(this);
-        setScreen(kartScreen);
+        gameControllerSelectScreen = new GameControllerSelectScreen();
+        setScreen(gameControllerSelectScreen);
     }
 }
