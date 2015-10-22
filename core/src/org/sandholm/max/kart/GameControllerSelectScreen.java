@@ -4,24 +4,27 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.math.Matrix4;
 
 /**
  * Created by max on 17.10.2015.
  */
 public class GameControllerSelectScreen extends MenuScreen implements Screen {
-    private BitmapFont font12;
+    private BitmapFont UIFont;
 
     @Override
     public void show() {
         super.show();
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("Roboto-Regular.ttf"));
         FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 12;
-        font12 = generator.generateFont(parameter); // font size 12 pixels
-        font12.getData().setScale(1f/Gdx.graphics.getWidth(), 1f/Gdx.graphics.getHeight());
-        generator.dispose();
+        parameter.size = screenHeight/10;
+        UIFont = fontGenerator.generateFont(parameter); // font size 12 pixels
+        UIFont.getData().setScale(1, 1);
+        //generator.dispose();
     }
 
     @Override
@@ -30,16 +33,10 @@ public class GameControllerSelectScreen extends MenuScreen implements Screen {
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
-        batch.setProjectionMatrix(camera.combined);
         batch.begin();
-        font12.setColor(Color.WHITE);
-        font12.draw(batch, "DOOT DOOT", 0, 0);
+        UIFont.setColor(Color.WHITE);
+        UIFont.draw(batch, "DOOT DOOT", 0, 100);
         batch.end();
-
-    }
-
-    @Override
-    public void resize(int width, int height) {
 
     }
 
