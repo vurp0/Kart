@@ -19,6 +19,12 @@ abstract public class MenuScreen implements Screen {
     protected int screenWidth;
     protected int screenHeight;
 
+    protected KartGame game;
+
+    public MenuScreen(KartGame game) {
+        this.game = game;
+    }
+
     @Override
     public void show(){
         screenWidth = Gdx.graphics.getWidth();

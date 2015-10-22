@@ -31,4 +31,8 @@ public class ControllerGameController implements GameController {
     public boolean getDrifting() {
         return controller.getButton(5);
     }
+
+    public Controller getController() {
+        return controller;
+    }
 }
