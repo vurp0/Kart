@@ -87,8 +87,7 @@ public class KartScreen implements Screen {
 
 		playerKart = new Kart("mario", level.getSpawnPoint().cpy(), level.getSpawnRotation(), gameWorld);
 		kartDecal = Decal.newDecal(1.28f, 1.28f, playerKart.getTextureRegionFromAngle(playerKart.getRotation()), true);
-		//playerKart.setController(new ControllerGameController(Controllers.getControllers().first()));
-		playerKart.setController(new KeyboardGameController());
+		playerKart.setController(game.kartGameController);
 
 		otherKarts = new ArrayList<Kart>();
 		otherKartDecal = new ArrayList<Decal>();
