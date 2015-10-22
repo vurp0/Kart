@@ -8,7 +8,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.math.Matrix4;
 
 /**
- * Created by max on 22.10.2015.
+ * Abstract class for implementing menu Screens.
  */
 abstract public class MenuScreen implements Screen {
     protected Matrix4 projection;
@@ -39,7 +39,10 @@ abstract public class MenuScreen implements Screen {
         batch.setProjectionMatrix(projection);
     }
 
-    public BitmapFont generateFont(int size) {
-        return null;
+    public BitmapFont generateFont(float size) {  //TODO: cache generated fonts somehow
+        //size is part of screenHeight
+        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
+        parameter.size = (int)(screenHeight*size);
+        return fontGenerator.generateFont(parameter);
     }
 }

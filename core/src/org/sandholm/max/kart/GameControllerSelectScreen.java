@@ -4,15 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeType;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
-import com.badlogic.gdx.math.Matrix4;
 
 /**
- * Created by max on 17.10.2015.
+ * Screen where the player selects the input method.
  */
 public class GameControllerSelectScreen extends MenuScreen implements Screen {
     private BitmapFont UIFont;
@@ -20,11 +16,7 @@ public class GameControllerSelectScreen extends MenuScreen implements Screen {
     @Override
     public void show() {
         super.show();
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = screenHeight/10;
-        UIFont = fontGenerator.generateFont(parameter); // font size 12 pixels
-        UIFont.getData().setScale(1, 1);
-        //generator.dispose();
+        UIFont = generateFont(0.1f);
     }
 
     @Override
