@@ -25,6 +25,7 @@ public class KartGame extends Game {
         multiplexer.addProcessor(gameControllerSelectScreen);
         Controllers.addListener(gameControllerSelectScreen);
         setScreen(gameControllerSelectScreen);
+        System.out.println(Controllers.getControllers());
     }
 
     public void setKartGameController(GameController gameController) {

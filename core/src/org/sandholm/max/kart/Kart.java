@@ -70,6 +70,7 @@ public class Kart {
         fixtureDef.restitution = 1f;
         pBody.setLinearDamping(FRICTION_S);
         pBody.createFixture(fixtureDef);
+        pBody.setUserData(this);
         shape.dispose();
     }
 
