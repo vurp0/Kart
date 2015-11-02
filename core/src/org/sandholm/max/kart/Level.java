@@ -14,6 +14,8 @@ import java.util.Map;
  */
 public class Level {
     Texture groundTexture;
+    Texture backgroundTexture;
+    float backgroundRepetition;
     Vector2 spawnPoint;
     float spawnRotation;
     float scale; //pixels per meter
@@ -32,10 +34,14 @@ public class Level {
             spawnRotation = ((Number)((Map)obj.get("spawn")).get("angle")).floatValue();
             scale = ((Number)obj.get("scale")).floatValue();
             groundTexture = new Texture("levels/"+levelName+"/"+obj.get("ground"));
+            backgroundTexture = new Texture("levels/"+levelName+"/"+((Map)obj.get("background")).get("file"));
+            backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
+            backgroundRepetition = ((Number)((Map)obj.get("background")).get("repetition")).floatValue();
 
             collisions = new ArrayList<Vector2[]>();
             for (Object j : (JSONArray)obj.get("collisions")) {
-                collisions.add(new Vector2[]{new Vector2(((Number)(((JSONObject)((JSONArray)j).get(0))).get("x")).floatValue(), ((Number)(((JSONObject)((JSONArray)j).get(0))).get("y")).floatValue()),
+                collisions.add(new Vector2[]{
+                        new Vector2(((Number)(((JSONObject)((JSONArray)j).get(0))).get("x")).floatValue(), ((Number)(((JSONObject)((JSONArray)j).get(0))).get("y")).floatValue()),
                         new Vector2(((Number)(((JSONObject)((JSONArray)j).get(1))).get("x")).floatValue(), ((Number)(((JSONObject)((JSONArray)j).get(1))).get("y")).floatValue()),
                         new Vector2(((Number)(((JSONObject)((JSONArray)j).get(2))).get("x")).floatValue(), ((Number)(((JSONObject)((JSONArray)j).get(2))).get("y")).floatValue()),
                         new Vector2(((Number)(((JSONObject)((JSONArray)j).get(3))).get("x")).floatValue(), ((Number)(((JSONObject)((JSONArray)j).get(3))).get("y")).floatValue())});

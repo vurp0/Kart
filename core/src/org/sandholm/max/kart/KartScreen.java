@@ -5,6 +5,7 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
@@ -16,8 +17,8 @@ import com.badlogic.gdx.physics.box2d.*;
 
 import java.util.ArrayList;
 
-public class KartScreen implements Screen, ContactListener {
-	KartGame game;
+public class KartScreen extends UIScreen implements Screen, ContactListener {
+	//KartGame game;
 
 	World gameWorld;
 
@@ -44,8 +45,10 @@ public class KartScreen implements Screen, ContactListener {
 	ArrayList<Kart> karts;
 	DumbAIGameController otherKartController;
 
+	BitmapFont UIFont;
+
 	public KartScreen(KartGame game) {
-		this.game = game;
+		super(game);
 	}
 
 	@Override
@@ -70,14 +73,7 @@ public class KartScreen implements Screen, ContactListener {
 		worldBodyDef.position.set(0,0);
 		PolygonShape shape = new PolygonShape();
 		Body worldBody = gameWorld.createBody(worldBodyDef);
-		/*shape.set(new Vector2[]{new Vector2(-63, -64), new Vector2(-64, -64), new Vector2(-64, 64), new Vector2(-63, 64)});
-		worldBody.createFixture(shape, 1);
-		shape.set(new Vector2[]{new Vector2(-64, -64), new Vector2(64, -64), new Vector2(64, -63), new Vector2(-64, -63)});
-		worldBody.createFixture(shape, 1);
-		shape.set(new Vector2[]{new Vector2(-64, 64), new Vector2(64, 64), new Vector2(64, 63), new Vector2(-64, 63)});
-		worldBody.createFixture(shape, 1);
-		shape.set(new Vector2[]{new Vector2(63, -64), new Vector2(64, -64), new Vector2(64, 64), new Vector2(63, 64)});
-		worldBody.createFixture(shape, 1);*/
+
 		for (Vector2[] box : level.getCollisions()) {
 			shape.set(box);
 			worldBody.createFixture(shape, 1);
@@ -114,11 +110,14 @@ public class KartScreen implements Screen, ContactListener {
 			kartDecal.add(Decal.newDecal(1.28f, 1.28f, k.getTextureRegionFromAngle(k.getRotation()), true));
 		}
 
+		UIFont = generateFont(0.08f);
+
+
 	}
 
 	@Override
 	public void resize(int width, int height) {
-
+		super.resize(width, height);
 	}
 
 	//TODO: this method could still be useful some day, and I should probably put it somewhere as a generic utility method
@@ -130,10 +129,9 @@ public class KartScreen implements Screen, ContactListener {
 	public void render(float deltaTime) {
 		stateTime += deltaTime;
 
-		Gdx.gl.glClearColor(0.4f, 0.5f, 1f, 1f);
+		Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 		Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
-		decalBatch.add(groundDecal);
 
 		for (Kart k: karts) {
 			k.update(deltaTime);
@@ -148,6 +146,16 @@ public class KartScreen implements Screen, ContactListener {
 		camera.lookAt(new Vector3(cameraFollowKart.getPosition(), CAMERA_HEIGHT - 1.5f));
 		camera.update();
 
+		UIBatch.begin();
+		float rotatedOffset = (cameraAngle * level.backgroundRepetition) / (360);
+		float screenRepetitions = level.backgroundRepetition*(camera.fieldOfView/360);
+		UIBatch.draw(level.backgroundTexture, 0, 0, screenWidth, screenHeight,
+				stateTime*2 % 1 - rotatedOffset,
+				MathUtils.sin(stateTime*2),
+				screenRepetitions + stateTime*2 % 1 - rotatedOffset,
+				screenRepetitions/(screenWidth/(float)screenHeight) +MathUtils.sin(stateTime*2));
+		UIBatch.end();
+
 		for (int i=0; i<karts.size(); i++) {
 			kartDecal.get(i).setTextureRegion(karts.get(i).getTextureRegionFromAngle(cameraAngle - karts.get(i).getRotation()));
 			kartDecal.get(i).setPosition(karts.get(i).getPosition().x, karts.get(i).getPosition().y, kartDecal.get(i).getHeight() / 2);
@@ -155,8 +163,13 @@ public class KartScreen implements Screen, ContactListener {
 			decalBatch.add(kartDecal.get(i));
 			karts.get(i).resetFrame();
 		}
+		decalBatch.add(groundDecal);
 		decalBatch.flush();
-		Gdx.graphics.setTitle(String.valueOf(Gdx.graphics.getFramesPerSecond()));
+
+		UIBatch.begin();
+		drawText(UIFont, UIBatch, Gdx.graphics.getFramesPerSecond()+" fps", screenWidth, 0, Anchor.SE);
+		UIBatch.end();
+		//Gdx.graphics.setTitle(String.valueOf(Gdx.graphics.getFramesPerSecond()));
 	}
 
 	@Override
