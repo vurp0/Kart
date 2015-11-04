@@ -24,14 +24,14 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 
 	static float CAMERA_HEIGHT = 4f;
-	static float SCREEN_SHAKE_SIZE = 0.5f;
 
 	float stateTime = 0f;
 
 	DecalBatch decalBatch;
 	Texture groundTexture;
 	PerspectiveCamera camera;
-	float screenShake = 0;
+
+	Shake shake;
 
 	Level level;
 
@@ -78,6 +78,7 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 			shape.set(box);
 			worldBody.createFixture(shape, 1);
 		}
+		gameWorld.setContactListener(this);
 
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		groundTexture = level.getGroundTexture();
@@ -111,7 +112,9 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		}
 
 		UIFont = generateFont(0.08f);
+		shake = new Shake();
 
+		game.multiplexer.addProcessor(new MyInputProcessor());
 
 	}
 
@@ -146,6 +149,7 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		camera.rotateAround(new Vector3(cameraFollowKart.getPosition(), 0), new Vector3(0f, 0f, 1f), cameraAngle);
 		camera.lookAt(new Vector3(cameraFollowKart.getPosition(), CAMERA_HEIGHT));
 		camera.rotate(camera.direction.cpy().rotate(camera.up, 90), cameraVerticalAngle);
+		shake.update(deltaTime, camera, camera.position);
 		camera.update();
 
 		UIBatch.begin();
@@ -201,6 +205,9 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 	@Override
 	public void beginContact(Contact contact) {
+		if(contact.getFixtureA().getBody().getUserData() == karts.get(0) || contact.getFixtureB().getBody().getUserData() == karts.get(0)) {
+			shake.shake(0.5f);
+		}
 
 	}
 
@@ -223,6 +230,10 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 		@Override
 		public boolean keyDown(int keycode) {
+			/*if (keycode == Input.Keys.H) {
+				shake.shake(0.5f);
+				return true;
+			}*/
 			return false;
 		}
 
