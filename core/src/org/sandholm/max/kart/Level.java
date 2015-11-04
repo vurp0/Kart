@@ -1,5 +1,6 @@
 package org.sandholm.max.kart;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.Vector2;
 import org.json.simple.*;
@@ -29,12 +30,12 @@ public class Level {
     public Level(String levelName) {
         try {
             JSONParser parser = new JSONParser();
-            Map obj = (Map)parser.parse(new FileReader("levels/"+levelName+"/level.json"));
+            Map obj = (Map)parser.parse(Gdx.files.internal("levels/"+levelName+"/level.json").reader());
             spawnPoint = new Vector2(((Number)((Map)obj.get("spawn")).get("x")).floatValue(), ((Number)(((Map)obj.get("spawn")).get("y"))).floatValue());
             spawnRotation = ((Number)((Map)obj.get("spawn")).get("angle")).floatValue();
             scale = ((Number)obj.get("scale")).floatValue();
             groundTexture = new Texture("levels/"+levelName+"/"+obj.get("ground"));
-            backgroundTexture = new Texture("levels/"+levelName+"/"+((Map)obj.get("background")).get("file"));
+            backgroundTexture = new Texture(Gdx.files.internal("levels/" + levelName + "/" + ((Map) obj.get("background")).get("file")));
             backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
             backgroundRepetition = ((Number)((Map)obj.get("background")).get("repetition")).floatValue();
 

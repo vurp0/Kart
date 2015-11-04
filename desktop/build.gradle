@@ -25,6 +25,17 @@ task dist(type: Jar) {
     }
 }
 
+task fatJar(type: Jar) {
+    manifest {
+        attributes 'Implementation-Title': 'Kart Game',
+                'Implementation-Version': version,
+                'Main-Class': 'org.sandholm.max.kart.desktop.DesktopLauncher'
+    }
+    baseName = project.name + '-all'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
+}
+
 dist.dependsOn classes
 
 eclipse {

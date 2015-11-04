@@ -1,5 +1,6 @@
 package org.sandholm.max.kart;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
@@ -33,7 +34,7 @@ public class Kart {
     public Kart(String kartName, Vector2 position, float rotation, World world) {
         try {
             JSONParser parser = new JSONParser();
-            Map obj = (Map)parser.parse(new FileReader("karts/"+kartName+".json"));
+            Map obj = (Map)parser.parse(Gdx.files.internal("karts/"+kartName+".json").reader());
             turningSpeed = ((Number)obj.get("turningSpeed")).floatValue();
             driftingSpeed = ((Number)obj.get("driftingSpeed")).floatValue();
             engineForce = ((Number)obj.get("engineForce")).floatValue();
