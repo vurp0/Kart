@@ -61,7 +61,8 @@ public class Shake {
      * Will make the camera shake for the duration passed in in seconds
      * @param d duration of the shake in seconds
      */
-    public void shake(float d){
+    public void shake(float d, float amplitude){
         shakeDuration = d;
+        this.amplitude = amplitude;
     }
 }

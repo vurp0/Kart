@@ -31,6 +31,8 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 	Texture groundTexture;
 	PerspectiveCamera camera;
 
+	
+
 	Shake shake;
 
 	Level level;
@@ -205,9 +207,6 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 	@Override
 	public void beginContact(Contact contact) {
-		if(contact.getFixtureA().getBody().getUserData() == karts.get(0) || contact.getFixtureB().getBody().getUserData() == karts.get(0)) {
-			shake.shake(0.5f);
-		}
 
 	}
 
@@ -219,10 +218,14 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
 
+
 	}
 
 	@Override
 	public void postSolve(Contact contact, ContactImpulse impulse) {
+		if(contact.getFixtureA().getBody().getUserData() == karts.get(0) || contact.getFixtureB().getBody().getUserData() == karts.get(0)) {
+			shake.shake(0.3f, Math.min(0.8f,impulse.getNormalImpulses()[0]/200));
+		}
 
 	}
 
