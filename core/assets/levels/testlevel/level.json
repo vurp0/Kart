@@ -8,7 +8,7 @@
   "scale":8,
   "ground":"ground.png",
   "background":{"file":"background.png",
-    "repetition":150
+    "repetition":5
   },
   "collisions":[[{"x":-63, "y":-64},{"x":-64, "y":-64},{"x":-64, "y":64},{"x":-63, "y":64}],
     [{"x":-64, "y":-64},{"x":64, "y":-64},{"x":64, "y":-63},{"x":-64, "y":-63}],

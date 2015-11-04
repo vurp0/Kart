@@ -24,22 +24,22 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 
 	static float CAMERA_HEIGHT = 4f;
+	static float SCREEN_SHAKE_SIZE = 0.5f;
 
 	float stateTime = 0f;
 
 	DecalBatch decalBatch;
 	Texture groundTexture;
 	PerspectiveCamera camera;
+	float screenShake = 0;
 
 	Level level;
 
 	float cameraAngle;
+	float cameraVerticalAngle;
 
 	Decal groundDecal;
-	//Decal kartDecal;
 	ArrayList<Decal> kartDecal;
-
-	GameController playerController;
 
 	Kart cameraFollowKart;
 	ArrayList<Kart> karts;
@@ -140,20 +140,23 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		gameWorld.step(deltaTime, 6, 2);
 
 		cameraAngle = MathUtils.radiansToDegrees*MathUtils.lerpAngle(MathUtils.degreesToRadians*cameraAngle, MathUtils.degreesToRadians*cameraFollowKart.getRotation(), 0.06f);
+		cameraVerticalAngle = 10;
 		camera.position.set(new Vector3(cameraFollowKart.getPosition(), 0).add(-8f, 0f, CAMERA_HEIGHT));
 		camera.up.set(0f, 0f, 1f);
 		camera.rotateAround(new Vector3(cameraFollowKart.getPosition(), 0), new Vector3(0f, 0f, 1f), cameraAngle);
-		camera.lookAt(new Vector3(cameraFollowKart.getPosition(), CAMERA_HEIGHT - 1.5f));
+		camera.lookAt(new Vector3(cameraFollowKart.getPosition(), CAMERA_HEIGHT));
+		camera.rotate(camera.direction.cpy().rotate(camera.up, 90), cameraVerticalAngle);
 		camera.update();
 
 		UIBatch.begin();
 		float rotatedOffset = (cameraAngle * level.backgroundRepetition) / (360);
 		float screenRepetitions = level.backgroundRepetition*(camera.fieldOfView/360);
+        float unitsPerDegree = screenRepetitions/camera.fieldOfView;
 		UIBatch.draw(level.backgroundTexture, 0, 0, screenWidth, screenHeight,
-				stateTime*2 % 1 - rotatedOffset,
-				MathUtils.sin(stateTime*2),
-				screenRepetitions + stateTime*2 % 1 - rotatedOffset,
-				screenRepetitions/(screenWidth/(float)screenHeight) +MathUtils.sin(stateTime*2));
+				- rotatedOffset,
+				0.5f+cameraVerticalAngle*unitsPerDegree*0.5f+((float)screenHeight/(float)screenWidth)*screenRepetitions*0.5f,
+				screenRepetitions - rotatedOffset,
+				0.5f+cameraVerticalAngle*unitsPerDegree*0.5f-((float)screenHeight/(float)screenWidth)*screenRepetitions*0.5f);
 		UIBatch.end();
 
 		for (int i=0; i<karts.size(); i++) {
@@ -191,14 +194,14 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 	public void dispose() {
 
 	}
-	
+
 	//***
 	//ContactListener
 	//***
 
 	@Override
 	public void beginContact(Contact contact) {
-		
+
 	}
 
 	@Override
