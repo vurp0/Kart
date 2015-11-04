@@ -30,8 +30,8 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 	DecalBatch decalBatch;
 	Texture groundTexture;
 	PerspectiveCamera camera;
-
-	
+	float cameraFOV = 45f;
+	float FOVIntensifier = 0f;
 
 	Shake shake;
 
@@ -56,10 +56,9 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 	@Override
 	public void show() {
 
-		float fieldOfView = 45;
 		float w = Gdx.graphics.getWidth();
 		float h = Gdx.graphics.getHeight();
-		camera = new PerspectiveCamera(fieldOfView, 1, h / w);
+		camera = new PerspectiveCamera(cameraFOV, 1, h / w);
 		camera.position.set(0f, 0f, 1f);
 		camera.lookAt(0f, 1f, 1f);
 		camera.near = 0.1f;
@@ -145,6 +144,7 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		gameWorld.step(deltaTime, 6, 2);
 
 		cameraAngle = MathUtils.radiansToDegrees*MathUtils.lerpAngle(MathUtils.degreesToRadians*cameraAngle, MathUtils.degreesToRadians*cameraFollowKart.getRotation(), 0.06f);
+		camera.fieldOfView = MathUtils.lerp(camera.fieldOfView, cameraFOV+FOVIntensifier, 0.1f);
 		cameraVerticalAngle = 10;
 		camera.position.set(new Vector3(cameraFollowKart.getPosition(), 0).add(-8f, 0f, CAMERA_HEIGHT));
 		camera.up.set(0f, 0f, 1f);
@@ -159,9 +159,9 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		float screenRepetitions = level.backgroundRepetition*(camera.fieldOfView/360);
         float unitsPerDegree = screenRepetitions/camera.fieldOfView;
 		UIBatch.draw(level.backgroundTexture, 0, 0, screenWidth, screenHeight,
-				- rotatedOffset,
+				-0.5f*screenRepetitions- rotatedOffset,
 				0.5f+cameraVerticalAngle*unitsPerDegree*0.5f+((float)screenHeight/(float)screenWidth)*screenRepetitions*0.5f,
-				screenRepetitions - rotatedOffset,
+				0.5f*screenRepetitions - rotatedOffset,
 				0.5f+cameraVerticalAngle*unitsPerDegree*0.5f-((float)screenHeight/(float)screenWidth)*screenRepetitions*0.5f);
 		UIBatch.end();
 
@@ -233,15 +233,19 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 		@Override
 		public boolean keyDown(int keycode) {
-			/*if (keycode == Input.Keys.H) {
-				shake.shake(0.5f);
+			if (keycode == Input.Keys.H) {
+				FOVIntensifier = 30f;
 				return true;
-			}*/
+			}
 			return false;
 		}
 
 		@Override
 		public boolean keyUp(int keycode) {
+			if (keycode == Input.Keys.H) {
+				FOVIntensifier = 0f;
+				return true;
+			}
             return false;
 		}
 
