@@ -69,6 +69,7 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 		gameWorld = new World(Vector2.Zero, true);
 
+		/*
 		BodyDef worldBodyDef = new BodyDef();
 		worldBodyDef.type = BodyDef.BodyType.StaticBody;
 		worldBodyDef.position.set(0,0);
@@ -78,12 +79,15 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		for (Vector2[] box : level.getCollisions()) {
 			shape.set(box);
 			worldBody.createFixture(shape, 1);
-		}
+		}*/
+		Body worldBody = level.createBody(gameWorld);
+		worldBody.setTransform(0,0,0);
 		gameWorld.setContactListener(this);
 
 		decalBatch = new DecalBatch(new CameraGroupStrategy(camera));
 		groundTexture = level.getGroundTexture();
 		groundDecal = Decal.newDecal(level.getGroundTexture().getWidth() / level.getScale(), level.getGroundTexture().getHeight() / level.getScale(), new TextureRegion(groundTexture));
+		groundDecal.setPosition(groundDecal.getWidth()/2,groundDecal.getHeight()/2,0);
 
 		karts = new ArrayList<Kart>();
 		kartDecal = new ArrayList<Decal>();
@@ -98,12 +102,12 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 		karts.add(playerKart);
 		for (int i = 0; i < 20; i++) {
-			Kart tempKart = new Kart("mario", new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld);
+			Kart tempKart = new Kart("mario", new Vector2((float) Math.random() * 100, (float) Math.random() * 100), (float) Math.random() * 360, gameWorld);
 			tempKart.setController(otherKartController);
 			karts.add(tempKart);
 		}
 		for (int i = 0; i < 20; i++) {
-			Kart tempKart = new Kart("tux", new Vector2((float) Math.random() * 100 - 50, (float) Math.random() * 100 - 50), (float) Math.random() * 360, gameWorld);
+			Kart tempKart = new Kart("tux", new Vector2((float) Math.random() * 100, (float) Math.random() * 100), (float) Math.random() * 360, gameWorld);
 			tempKart.setController(otherKartController);
 			karts.add(tempKart);
 		}
@@ -122,6 +126,8 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 	@Override
 	public void resize(int width, int height) {
 		super.resize(width, height);
+		camera.viewportWidth = width/(float)height;
+		camera.viewportHeight = 1;
 	}
 
 	//TODO: this method could still be useful some day, and I should probably put it somewhere as a generic utility method
@@ -172,11 +178,12 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 			decalBatch.add(kartDecal.get(i));
 			karts.get(i).resetFrame();
 		}
+		//groundDecal.setPosition(MathUtils.sin(stateTime), 0, 0);
 		decalBatch.add(groundDecal);
 		decalBatch.flush();
 
 		UIBatch.begin();
-		drawText(UIFont, UIBatch, Gdx.graphics.getFramesPerSecond()+" fps", screenWidth, 0, Anchor.SE);
+		drawText(UIFont, UIBatch, karts.get(0).getPosition().x+" "+karts.get(0).getPosition().y, screenWidth, 0, Anchor.SE);
 		UIBatch.end();
 		//Gdx.graphics.setTitle(String.valueOf(Gdx.graphics.getFramesPerSecond()));
 	}
@@ -217,14 +224,17 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
-
-
+		if(contact.getFixtureA().getBody().getUserData() == karts.get(0)||contact.getFixtureB().getBody().getUserData() == karts.get(0)) {
+			if (Gdx.input.isKeyPressed(Input.Keys.R)) {
+				contact.setEnabled(false);
+			}
+		}
 	}
 
 	@Override
 	public void postSolve(Contact contact, ContactImpulse impulse) {
 		if(contact.getFixtureA().getBody().getUserData() == karts.get(0) || contact.getFixtureB().getBody().getUserData() == karts.get(0)) {
-			shake.shake(0.3f, Math.min(0.8f,impulse.getNormalImpulses()[0]/200));
+			shake.shake(0.3f, Math.min(0.8f,impulse.getNormalImpulses()[0]/300));
 		}
 
 	}
@@ -234,7 +244,7 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		@Override
 		public boolean keyDown(int keycode) {
 			if (keycode == Input.Keys.H) {
-				FOVIntensifier = 30f;
+				FOVIntensifier = 20f;
 				return true;
 			}
 			return false;

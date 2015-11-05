@@ -114,14 +114,8 @@ public class Kart {
         pBody.applyForceToCenter(new Vector2(engineForce, 0).rotate(rotation), true);
     }
 
-    public void stopAccelerating() { //useless
-    }
-
     public void brake() {
-        pBody.applyForceToCenter(pBody.getLinearVelocity().cpy().rotate(180).scl(1.5f).add(new Vector2(-35f, 0).rotate(rotation)), true);
-    }
-
-    public void stopBraking() { //useless
+        pBody.applyForceToCenter(pBody.getLinearVelocity().cpy().rotate(180).scl(1.5f).add(new Vector2(-45f, 0).rotate(rotation)), true);
     }
 
     public void turn(float amount, float deltaTime, boolean drift) { //amount defines how much to turn, and what direction, float between -1 and 1
