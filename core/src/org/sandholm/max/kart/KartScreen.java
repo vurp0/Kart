@@ -215,16 +215,35 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 	@Override
 	public void beginContact(Contact contact) {
 
+		/*if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
+			if (contact.getFixtureB().getUserData() == Level.GroundType.SLOW) {
+				((Kart)contact.getFixtureA().getBody().getUserData()).getBody().setLinearDamping(10*Kart.FRICTION_S);
+			}
+		} else if (contact.getFixtureB().getBody().getUserData() instanceof Kart) {
+			if (contact.getFixtureA().getUserData() == Level.GroundType.SLOW) {
+				((Kart)contact.getFixtureB().getBody().getUserData()).setFriction(10*Kart.FRICTION_S);
+			}
+		}*/
+
 	}
 
 	@Override
 	public void endContact(Contact contact) {
-
+		/*if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
+			if (contact.getFixtureB().getUserData() == Level.GroundType.SLOW) {
+				((Kart)contact.getFixtureA().getBody().getUserData()).setFriction(Kart.FRICTION_S);
+			}
+		} else if (contact.getFixtureB().getBody().getUserData() instanceof Kart) {
+			if (contact.getFixtureA().getUserData() == Level.GroundType.SLOW) {
+				((Kart)contact.getFixtureB().getBody().getUserData()).setFriction(Kart.FRICTION_S);
+			}
+		}*/
 	}
 
 	@Override
 	public void preSolve(Contact contact, Manifold oldManifold) {
-		if(contact.getFixtureA().getBody().getUserData() == karts.get(0)||contact.getFixtureB().getBody().getUserData() == karts.get(0)) {
+		if(compareAB(karts.get(0), contact.getFixtureA().getBody().getUserData(), contact.getFixtureB().getBody().getUserData())){
+		//if(contact.getFixtureA().getBody().getUserData() == karts.get(0)||contact.getFixtureB().getBody().getUserData() == karts.get(0)) {
 			if (Gdx.input.isKeyPressed(Input.Keys.R)) {
 				contact.setEnabled(false);
 			}
@@ -233,10 +252,14 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 	@Override
 	public void postSolve(Contact contact, ContactImpulse impulse) {
-		if(contact.getFixtureA().getBody().getUserData() == karts.get(0) || contact.getFixtureB().getBody().getUserData() == karts.get(0)) {
+		if(compareAB(cameraFollowKart, contact.getFixtureA().getBody().getUserData(), contact.getFixtureB().getBody().getUserData())) {
+		//if(contact.getFixtureA().getBody().getUserData() == cameraFollowKart || contact.getFixtureB().getBody().getUserData() == cameraFollowKart) {
 			shake.shake(0.3f, Math.min(0.8f,impulse.getNormalImpulses()[0]/300));
 		}
+	}
 
+	static boolean compareAB(Object compare, Object A, Object B) {
+		return (compare == A || compare == B);
 	}
 
 	class MyInputProcessor implements InputProcessor {

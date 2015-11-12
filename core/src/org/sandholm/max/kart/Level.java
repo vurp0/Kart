@@ -11,6 +11,7 @@ import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import org.json.simple.*;
 import org.json.simple.parser.*;
 
@@ -22,6 +23,8 @@ import java.util.Map;
  * Defines a level (track) with a spawn point, ground texture, etc.
  */
 public class Level {
+    static enum GroundType{SOLID, SLOW, WATER};
+
     Texture groundTexture;
     Texture backgroundTexture;
     float backgroundRepetition;
@@ -30,12 +33,6 @@ public class Level {
     float scale; //pixels per meter
 
     TiledMap map;
-
-    public ArrayList<Vector2[]> getCollisions() {
-        return collisions;
-    }
-
-    ArrayList<Vector2[]> collisions;
 
     public Level(String levelName) {
         try {
@@ -50,14 +47,6 @@ public class Level {
             backgroundRepetition = ((Number)((Map)obj.get("background")).get("repetition")).floatValue();
             map = new TmxMapLoader().load("levels/"+levelName+"/"+obj.get("map"));
 
-            collisions = new ArrayList<Vector2[]>();
-            for (Object j : (JSONArray)obj.get("collisions")) {
-                collisions.add(new Vector2[]{
-                        new Vector2(((Number)(((JSONObject)((JSONArray)j).get(0))).get("x")).floatValue(), ((Number)(((JSONObject)((JSONArray)j).get(0))).get("y")).floatValue()),
-                        new Vector2(((Number)(((JSONObject)((JSONArray)j).get(1))).get("x")).floatValue(), ((Number)(((JSONObject)((JSONArray)j).get(1))).get("y")).floatValue()),
-                        new Vector2(((Number)(((JSONObject)((JSONArray)j).get(2))).get("x")).floatValue(), ((Number)(((JSONObject)((JSONArray)j).get(2))).get("y")).floatValue()),
-                        new Vector2(((Number)(((JSONObject)((JSONArray)j).get(3))).get("x")).floatValue(), ((Number)(((JSONObject)((JSONArray)j).get(3))).get("y")).floatValue())});
-            }
             
         } catch(Exception e) {
             e.printStackTrace();
@@ -65,7 +54,7 @@ public class Level {
     }
 
     public Body createBody(World world) {
-        MapObjects objs = map.getLayers().get("Object Layer 1").getObjects();
+        MapObjects objs = map.getLayers().get("Solid layer").getObjects();
         BodyDef bd = new BodyDef();
         bd.type = BodyDef.BodyType.StaticBody;
         Body body = world.createBody(bd);
@@ -93,9 +82,58 @@ public class Level {
                 continue;
             }
 
-            body.createFixture(shape, 1);
-
+            Fixture solidFixture = body.createFixture(shape, 1);
+            solidFixture.setUserData(GroundType.SOLID);
             shape.dispose();
+        }
+
+        objs = map.getLayers().get("Slow layer").getObjects();
+
+        for (MapObject obj: objs) {
+            if (obj instanceof TextureMapObject) {
+                continue;
+            }
+
+            Array<Shape> shapes = new Array<>();
+
+            if (obj instanceof RectangleMapObject) {
+                shapes.add(getRectangle((RectangleMapObject)obj));
+            }
+            else if (obj instanceof PolygonMapObject) {
+                //shape = getPolygon((PolygonMapObject)obj);
+                float[] vertices = ((PolygonMapObject) obj).getPolygon().getTransformedVertices();
+                Array<Vector2> vectors = new Array<>();
+                for (int i=0; i<vertices.length; i+=2) {
+                    vectors.add(new Vector2(vertices[i]/scale,vertices[i+1]/scale));
+                }
+                Array<Array<Vector2>> partitionedPolygon = BayazitDecomposer.ConvexPartition(vectors);
+                //Array<PolygonShape> polygons = new Array<>();
+                for (Array<Vector2> poly : partitionedPolygon) {
+                    PolygonShape tmpShape = new PolygonShape();
+                    tmpShape.set(poly.toArray(Vector2.class));
+                    shapes.add(tmpShape);
+                }
+
+            }
+            else if (obj instanceof PolylineMapObject) {
+                shapes.add(getPolyline((PolylineMapObject)obj));
+            }
+            else if (obj instanceof CircleMapObject) {
+                shapes.add(getCircle((CircleMapObject)obj));
+            }
+            else {
+                continue;
+            }
+
+            for (Shape shape: shapes) {
+                Fixture solidFixture = body.createFixture(shape, 1);
+                solidFixture.setSensor(true);
+                solidFixture.setUserData(GroundType.SLOW);
+                shape.dispose();
+            }
+            //Fixture solidFixture = body.createFixture(shape, 1);
+            //solidFixture.setUserData(GroundType.SOLID);
+            //shape.dispose();
         }
         return body;
     }

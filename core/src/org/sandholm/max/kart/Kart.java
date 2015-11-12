@@ -14,6 +14,16 @@ import java.util.Map;
 public class Kart {
     static float FRICTION_S = 2f;
 
+    float friction;
+
+    public float getFriction() {
+        return friction;
+    }
+
+    public void setFriction(float friction) {
+        this.friction = friction;
+    }
+
     float turningSpeed;
     float driftingSpeed;
     float engineForce;
@@ -69,7 +79,8 @@ public class Kart {
         fixtureDef.shape = shape;
         fixtureDef.density = density;
         fixtureDef.restitution = 1f;
-        pBody.setLinearDamping(FRICTION_S);
+        setFriction(FRICTION_S);
+        pBody.setLinearDamping(friction);
         pBody.createFixture(fixtureDef);
         pBody.setUserData(this);
         shape.dispose();
@@ -91,7 +102,7 @@ public class Kart {
     }
 
     public void resetFrame() {
-        pBody.setLinearDamping(FRICTION_S);
+        pBody.setLinearDamping(friction);
     }
 
     public void setController(GameController controller) {
@@ -127,11 +138,12 @@ public class Kart {
             rotation += driftingSpeed*amount*deltaTime;
             rotation = (rotation % 360 + 360) % 360;
             pBody.applyForceToCenter(new Vector2(2f*amount, 0f).rotate(rotation+90), true);
-            pBody.setLinearDamping(FRICTION_S-(1f*Math.abs(amount)));
+            pBody.setLinearDamping(friction-(1f*Math.abs(amount)));
         }
     }
 
 
-
-
+    public Body getBody() {
+        return pBody;
+    }
 }
