@@ -70,17 +70,6 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 
 		gameWorld = new World(Vector2.Zero, true);
 
-		/*
-		BodyDef worldBodyDef = new BodyDef();
-		worldBodyDef.type = BodyDef.BodyType.StaticBody;
-		worldBodyDef.position.set(0,0);
-		PolygonShape shape = new PolygonShape();
-		Body worldBody = gameWorld.createBody(worldBodyDef);
-
-		for (Vector2[] box : level.getCollisions()) {
-			shape.set(box);
-			worldBody.createFixture(shape, 1);
-		}*/
 		Body worldBody = level.createBody(gameWorld);
 		worldBody.setTransform(0,0,0);
 		gameWorld.setContactListener(this);
@@ -221,10 +210,14 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
 			if (contact.getFixtureB().getUserData() == Level.GroundType.SLOW) {
 				((Kart)contact.getFixtureA().getBody().getUserData()).currentContacts += 1;
+			} else if (contact.getFixtureB().getUserData() == Level.GroundType.HOLLOW) {
+				((Kart)contact.getFixtureA().getBody().getUserData()).resetPosition((float)Math.random()*64f, (float)Math.random()*64f, (float)Math.random()*360f);
 			}
 		} else if (contact.getFixtureB().getBody().getUserData() instanceof Kart) {
 			if (contact.getFixtureA().getUserData() == Level.GroundType.SLOW) {
 				((Kart)contact.getFixtureB().getBody().getUserData()).currentContacts += 1;
+			} else if (contact.getFixtureA().getUserData() == Level.GroundType.HOLLOW) {
+				((Kart)contact.getFixtureB().getBody().getUserData()).resetPosition((float)Math.random()*64f, (float)Math.random()*64f, (float)Math.random()*360f);
 			}
 		}
 

@@ -23,7 +23,7 @@ import java.util.Map;
  * Defines a level (track) with a spawn point, ground texture, etc.
  */
 public class Level {
-    static enum GroundType{SOLID, SLOW, WATER};
+    static enum GroundType{SOLID, SLOW, HOLLOW};
 
     Texture groundTexture;
     Texture backgroundTexture;
@@ -64,27 +64,31 @@ public class Level {
                 continue;
             }
 
-            Shape shape;
+            //Shape shape;
+            Array<Shape> shapes = new Array<>();
 
             if (obj instanceof RectangleMapObject) {
-                shape = getRectangle((RectangleMapObject)obj);
+                shapes.add(getRectangle((RectangleMapObject)obj));
             }
             else if (obj instanceof PolygonMapObject) {
-                shape = getPolygon((PolygonMapObject)obj);
+                shapes.addAll(getSplitPolygons((PolygonMapObject)obj));
             }
             else if (obj instanceof PolylineMapObject) {
-                shape = getPolyline((PolylineMapObject)obj);
+                shapes.add(getPolyline((PolylineMapObject)obj));
             }
             else if (obj instanceof CircleMapObject) {
-                shape = getCircle((CircleMapObject)obj);
+                shapes.add(getCircle((CircleMapObject)obj));
             }
             else {
                 continue;
             }
 
-            Fixture solidFixture = body.createFixture(shape, 1);
-            solidFixture.setUserData(GroundType.SOLID);
-            shape.dispose();
+
+            for (Shape shape: shapes) {
+                Fixture solidFixture = body.createFixture(shape, 1);
+                solidFixture.setUserData(GroundType.SOLID);
+                shape.dispose();
+            }
         }
 
         objs = map.getLayers().get("Slow layer").getObjects();
@@ -101,18 +105,7 @@ public class Level {
             }
             else if (obj instanceof PolygonMapObject) {
                 //shape = getPolygon((PolygonMapObject)obj);
-                float[] vertices = ((PolygonMapObject) obj).getPolygon().getTransformedVertices();
-                Array<Vector2> vectors = new Array<>();
-                for (int i=0; i<vertices.length; i+=2) {
-                    vectors.add(new Vector2(vertices[i]/scale,vertices[i+1]/scale));
-                }
-                Array<Array<Vector2>> partitionedPolygon = BayazitDecomposer.ConvexPartition(vectors);
-                //Array<PolygonShape> polygons = new Array<>();
-                for (Array<Vector2> poly : partitionedPolygon) {
-                    PolygonShape tmpShape = new PolygonShape();
-                    tmpShape.set(poly.toArray(Vector2.class));
-                    shapes.add(tmpShape);
-                }
+                shapes.addAll(getSplitPolygons((PolygonMapObject)obj));
 
             }
             else if (obj instanceof PolylineMapObject) {
@@ -131,9 +124,41 @@ public class Level {
                 solidFixture.setUserData(GroundType.SLOW);
                 shape.dispose();
             }
-            //Fixture solidFixture = body.createFixture(shape, 1);
-            //solidFixture.setUserData(GroundType.SOLID);
-            //shape.dispose();
+        }
+
+        objs = map.getLayers().get("Hollow layer").getObjects();
+
+        for (MapObject obj: objs) {
+            if (obj instanceof TextureMapObject) {
+                continue;
+            }
+
+            Array<Shape> shapes = new Array<>();
+
+            if (obj instanceof RectangleMapObject) {
+                shapes.add(getRectangle((RectangleMapObject)obj));
+            }
+            else if (obj instanceof PolygonMapObject) {
+                //shape = getPolygon((PolygonMapObject)obj);
+                shapes.addAll(getSplitPolygons((PolygonMapObject)obj));
+
+            }
+            else if (obj instanceof PolylineMapObject) {
+                shapes.add(getPolyline((PolylineMapObject)obj));
+            }
+            else if (obj instanceof CircleMapObject) {
+                shapes.add(getCircle((CircleMapObject)obj));
+            }
+            else {
+                continue;
+            }
+
+            for (Shape shape: shapes) {
+                Fixture solidFixture = body.createFixture(shape, 1);
+                solidFixture.setSensor(true);
+                solidFixture.setUserData(GroundType.HOLLOW);
+                shape.dispose();
+            }
         }
         return body;
     }
@@ -151,6 +176,24 @@ public class Level {
     /*
      * Following functions adapted from http://stackoverflow.com/questions/18039781/collision-detection-tmx-maps-using-libgdx-java
      */
+
+    private Array<PolygonShape> getSplitPolygons(PolygonMapObject polygonObject) {
+        Array<PolygonShape> out = new Array<>();
+        float[] vertices = polygonObject.getPolygon().getTransformedVertices();
+        Array<Vector2> vectors = new Array<>();
+        for (int i=0; i<vertices.length; i+=2) {
+            vectors.add(new Vector2(vertices[i]/scale,vertices[i+1]/scale));
+        }
+        Array<Array<Vector2>> partitionedPolygon = BayazitDecomposer.ConvexPartition(vectors);
+        //Array<PolygonShape> polygons = new Array<>();
+        for (Array<Vector2> poly : partitionedPolygon) {
+            PolygonShape tmpShape = new PolygonShape();
+            tmpShape.set(poly.toArray(Vector2.class));
+            out.add(tmpShape);
+        }
+
+        return out;
+    }
 
     private PolygonShape getRectangle(RectangleMapObject rectangleObject) {
         Rectangle rectangle = rectangleObject.getRectangle();

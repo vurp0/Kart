@@ -34,6 +34,10 @@ public class Kart {
     float length;
     float density;
 
+    private boolean resetTransform = false;
+    private Vector2 resetPosition;
+    private float resetAngle;
+
     Texture spriteSheet;
     TextureRegion[] kartSprites;
 
@@ -111,10 +115,21 @@ public class Kart {
         }
 
         pBody.setLinearDamping(friction);
+
+        if (resetTransform) {
+            pBody.setTransform(resetPosition.x, resetPosition.y, resetAngle);
+            resetTransform = false;
+        }
     }
 
     public void resetFrame() {
         pBody.setLinearDamping(friction);
+    }
+
+    public void resetPosition(float x, float y, float angle) {
+        resetTransform = true;
+        resetPosition = new Vector2(x, y);
+        resetAngle = angle;
     }
 
     public void setController(GameController controller) {
