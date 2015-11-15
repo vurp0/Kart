@@ -9,10 +9,13 @@ import com.badlogic.gdx.physics.box2d.*;
 import org.json.simple.parser.JSONParser;
 
 import java.io.FileReader;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class Kart {
     static float FRICTION_S = 2f;
+    int currentContacts;
 
     float friction;
 
@@ -84,6 +87,8 @@ public class Kart {
         pBody.createFixture(fixtureDef);
         pBody.setUserData(this);
         shape.dispose();
+
+        currentContacts = 0;
     }
 
     public void update(float deltaTime) {
@@ -99,6 +104,13 @@ public class Kart {
 
         position.set(pBody.getPosition());
         pBody.setTransform(pBody.getPosition(), rotation*MathUtils.degreesToRadians);
+        if (currentContacts != 0) {
+            setFriction(4*FRICTION_S);
+        } else {
+            setFriction(FRICTION_S);
+        }
+
+        pBody.setLinearDamping(friction);
     }
 
     public void resetFrame() {

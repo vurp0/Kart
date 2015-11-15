@@ -14,6 +14,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 
@@ -147,7 +148,9 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 			k.update(deltaTime);
 		}
 
+
 		gameWorld.step(deltaTime, 6, 2);
+
 
 		cameraAngle = MathUtils.radiansToDegrees*MathUtils.lerpAngle(MathUtils.degreesToRadians*cameraAngle, MathUtils.degreesToRadians*cameraFollowKart.getRotation(), 0.06f);
 		camera.fieldOfView = MathUtils.lerp(camera.fieldOfView, cameraFOV+FOVIntensifier, 0.1f);
@@ -183,7 +186,7 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		decalBatch.flush();
 
 		UIBatch.begin();
-		drawText(UIFont, UIBatch, karts.get(0).getPosition().x+" "+karts.get(0).getPosition().y, screenWidth, 0, Anchor.SE);
+		drawText(UIFont, UIBatch, String.valueOf(Gdx.graphics.getFramesPerSecond()), screenWidth, 0, Anchor.SE);
 		UIBatch.end();
 		//Gdx.graphics.setTitle(String.valueOf(Gdx.graphics.getFramesPerSecond()));
 	}
@@ -215,29 +218,29 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 	@Override
 	public void beginContact(Contact contact) {
 
-		/*if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
+		if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
 			if (contact.getFixtureB().getUserData() == Level.GroundType.SLOW) {
-				((Kart)contact.getFixtureA().getBody().getUserData()).getBody().setLinearDamping(10*Kart.FRICTION_S);
+				((Kart)contact.getFixtureA().getBody().getUserData()).currentContacts += 1;
 			}
 		} else if (contact.getFixtureB().getBody().getUserData() instanceof Kart) {
 			if (contact.getFixtureA().getUserData() == Level.GroundType.SLOW) {
-				((Kart)contact.getFixtureB().getBody().getUserData()).setFriction(10*Kart.FRICTION_S);
+				((Kart)contact.getFixtureB().getBody().getUserData()).currentContacts += 1;
 			}
-		}*/
+		}
 
 	}
 
 	@Override
 	public void endContact(Contact contact) {
-		/*if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
+		if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
 			if (contact.getFixtureB().getUserData() == Level.GroundType.SLOW) {
-				((Kart)contact.getFixtureA().getBody().getUserData()).setFriction(Kart.FRICTION_S);
+				((Kart)contact.getFixtureA().getBody().getUserData()).currentContacts -= 1;
 			}
 		} else if (contact.getFixtureB().getBody().getUserData() instanceof Kart) {
 			if (contact.getFixtureA().getUserData() == Level.GroundType.SLOW) {
-				((Kart)contact.getFixtureB().getBody().getUserData()).setFriction(Kart.FRICTION_S);
+				((Kart)contact.getFixtureB().getBody().getUserData()).currentContacts -= 1;
 			}
-		}*/
+		}
 	}
 
 	@Override
