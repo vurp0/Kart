@@ -1,7 +1,10 @@
 package org.sandholm.max.kart;
 
 import com.badlogic.gdx.*;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
+import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.PerspectiveCamera;
@@ -18,7 +21,7 @@ import com.badlogic.gdx.utils.Array;
 
 import java.util.ArrayList;
 
-public class KartScreen extends UIScreen implements Screen, ContactListener {
+public class KartScreen extends UIScreen implements Screen, ContactListener, InputProcessor, ControllerListener {
 	//KartGame game;
 
 	World gameWorld;
@@ -109,7 +112,7 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		UIFont = generateFont(0.08f);
 		shake = new Shake();
 
-		game.multiplexer.addProcessor(new MyInputProcessor());
+		game.multiplexer.addProcessor(this);
 
 	}
 
@@ -220,7 +223,6 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 				((Kart)contact.getFixtureB().getBody().getUserData()).resetPosition((float)Math.random()*64f, (float)Math.random()*64f, (float)Math.random()*360f);
 			}
 		}
-
 	}
 
 	@Override
@@ -258,54 +260,97 @@ public class KartScreen extends UIScreen implements Screen, ContactListener {
 		return (compare == A || compare == B);
 	}
 
-	class MyInputProcessor implements InputProcessor {
 
-		@Override
-		public boolean keyDown(int keycode) {
-			if (keycode == Input.Keys.H) {
-				FOVIntensifier = 20f;
-				return true;
-			}
+	@Override
+	public boolean keyDown(int keycode) {
+		if (keycode == Input.Keys.H) {
+			FOVIntensifier = 20f;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode) {
+		if (keycode == Input.Keys.H) {
+			FOVIntensifier = 0f;
+			return true;
+		}
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int screenX, int screenY, int pointer, int button) {
+		return false;
+	}
+
+	@Override
+	public boolean touchDragged(int screenX, int screenY, int pointer) {
+		return false;
+	}
+
+	@Override
+	public boolean mouseMoved(int screenX, int screenY) {
+		return false;
+	}
+
+	@Override
+	public boolean scrolled(int amount) {
 			return false;
 		}
 
-		@Override
-		public boolean keyUp(int keycode) {
-			if (keycode == Input.Keys.H) {
-				FOVIntensifier = 0f;
-				return true;
-			}
-            return false;
-		}
+	@Override
+	public void connected(Controller controller) {
 
-		@Override
-		public boolean keyTyped(char character) {
-			return false;
-		}
+	}
 
-		@Override
-		public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-			return false;
-		}
+	@Override
+	public void disconnected(Controller controller) {
 
-		@Override
-		public boolean touchUp(int screenX, int screenY, int pointer, int button) {
-			return false;
-		}
+	}
 
-		@Override
-		public boolean touchDragged(int screenX, int screenY, int pointer) {
-			return false;
-		}
+	@Override
+	public boolean buttonDown(Controller controller, int buttonCode) {
+		return false;
+	}
 
-		@Override
-		public boolean mouseMoved(int screenX, int screenY) {
-			return false;
-		}
+	@Override
+	public boolean buttonUp(Controller controller, int buttonCode) {
+		return false;
+	}
 
-		@Override
-		public boolean scrolled(int amount) {
-			return false;
-		}
+	@Override
+	public boolean axisMoved(Controller controller, int axisCode, float value) {
+		return false;
+	}
+
+	@Override
+	public boolean povMoved(Controller controller, int povCode, PovDirection value) {
+		return false;
+	}
+
+	@Override
+	public boolean xSliderMoved(Controller controller, int sliderCode, boolean value) {
+		return false;
+	}
+
+	@Override
+	public boolean ySliderMoved(Controller controller, int sliderCode, boolean value) {
+		return false;
+	}
+
+	@Override
+	public boolean accelerometerMoved(Controller controller, int accelerometerCode, Vector3 value) {
+		return false;
 	}
 }

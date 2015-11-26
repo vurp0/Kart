@@ -1,9 +1,7 @@
 package org.sandholm.max.kart;
 
-import com.badlogic.gdx.ApplicationListener;
-import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 
 /**
@@ -16,20 +14,31 @@ public class KartGame extends Game {
     GameController kartGameController;
 
     GameControllerSelectScreen gameControllerSelectScreen;
+    MainMenuScreen mainMenuScreen;
 
     @Override
     public void create() {
         multiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(multiplexer);
         gameControllerSelectScreen = new GameControllerSelectScreen(this);
-        multiplexer.addProcessor(gameControllerSelectScreen);
-        Controllers.addListener(gameControllerSelectScreen);
-        setScreen(gameControllerSelectScreen);
+        mainMenuScreen = new MainMenuScreen(this);
+        multiplexer.addProcessor(mainMenuScreen);
+        Controllers.addListener(mainMenuScreen);
+        setScreen(mainMenuScreen);
         System.out.println(Controllers.getControllers());
     }
 
     public void setKartGameController(GameController gameController) {
         this.kartGameController = gameController;
+    }
+
+    @Override
+    public void setScreen(Screen screen) {
+        multiplexer.clear();
+        Controllers.clearListeners();
+        super.setScreen(screen);
+        //multiplexer.addProcessor((InputProcessor)screen);
+        //Controllers.addListener((ControllerListener)screen);
     }
 
     public void startGame() {

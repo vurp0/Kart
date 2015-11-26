@@ -5,6 +5,7 @@ import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
@@ -24,6 +25,8 @@ public class GameControllerSelectScreen extends UIScreen implements Screen, Inpu
     @Override
     public void show() {
         UIFont = generateFont(0.08f);
+        game.multiplexer.addProcessor(this);
+        Controllers.addListener(this);
     }
 
     @Override
@@ -53,6 +56,7 @@ public class GameControllerSelectScreen extends UIScreen implements Screen, Inpu
     public void hide() {
 
     }
+
 
     @Override
     public void dispose() {
