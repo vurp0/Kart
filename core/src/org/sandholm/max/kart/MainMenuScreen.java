@@ -10,13 +10,26 @@ import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Align;
 
 /**
  * Main menu screen
  */
 public class MainMenuScreen extends UIScreen implements Screen, InputProcessor, ControllerListener {
-    private BitmapFont UIFont;
+    private BitmapFont titleFont;
+    private Group titleLabel;
+
+    private BitmapFont subTitleFont;
+    private Group subtitleLabel;
+
+    private float stateTime;
+
 
     public MainMenuScreen(KartGame game) {
         super(game);
@@ -24,7 +37,23 @@ public class MainMenuScreen extends UIScreen implements Screen, InputProcessor, 
 
     @Override
     public void show() {
-        UIFont = generateFont(0.08f);
+        stateTime = 0f;
+        titleFont = generateFont(0.13f);
+        titleLabel = new Group();
+        Label tmpTitleLabel = new Label("Epic Kart Racing Game", new Label.LabelStyle(titleFont, Color.WHITE));
+        tmpTitleLabel.setPosition(0,0,Align.center);
+        titleLabel.addActor(tmpTitleLabel);
+        titleLabel.setPosition(screenWidth*0.5f, screenHeight*0.6f, Align.center);
+        titleLabel.setOrigin(Align.center);
+
+        subTitleFont = generateFont(0.06f);
+        subtitleLabel = new Group();
+        Label tmpSubtitleLabel = new Label("Press button", new Label.LabelStyle(subTitleFont, Color.WHITE));
+        tmpSubtitleLabel.setPosition(0,0,Align.center);
+        subtitleLabel.addActor(tmpSubtitleLabel);
+        subtitleLabel.setPosition(screenWidth*0.5f, screenHeight*0.3f, Align.center);
+        subtitleLabel.setOrigin(Align.center);
+
         game.multiplexer.addProcessor(this);
         Controllers.addListener(this);
 
@@ -32,13 +61,20 @@ public class MainMenuScreen extends UIScreen implements Screen, InputProcessor, 
 
     @Override
     public void render(float delta) {
+        stateTime += delta;
+
         Gdx.gl.glClearColor(0.4f, 0.5f, 1f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
+        titleLabel.setRotation(MathUtils.sin(stateTime*1.8f)*4f);
+        subtitleLabel.setScale(1+0.1f*MathUtils.sin(stateTime*2.5f));
+
         UIBatch.begin();
-        UIFont.setColor(Color.WHITE);
-        drawText(UIFont, UIBatch, "Welcome to Epic Racing Game", screenWidth/2, screenHeight/2, Anchor.CENTER);
+        titleFont.setColor(Color.WHITE);
+        titleLabel.draw(UIBatch, 1);
+        subtitleLabel.draw(UIBatch, 1);
+        //drawText(titleFont, UIBatch, "Epic Kart Racing Game", screenWidth/2, screenHeight/2, Anchor.CENTER);
         UIBatch.end();
 
 
@@ -46,7 +82,11 @@ public class MainMenuScreen extends UIScreen implements Screen, InputProcessor, 
 
     @Override
     public void resize(int width, int height) {
-
+        super.resize(width, height);
+        titleLabel.setPosition(screenWidth*0.5f, screenHeight*0.6f, Align.center);
+        titleLabel.setOrigin(Align.center);
+        subtitleLabel.setPosition(screenWidth*0.5f, screenHeight*0.3f, Align.center);
+        subtitleLabel.setOrigin(Align.center);
     }
 
     @Override
