@@ -68,7 +68,7 @@ public class MainMenuScreen extends UIScreen implements Screen, InputProcessor, 
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
         titleLabel.setRotation(MathUtils.sin(stateTime*1.8f)*4f);
-        subtitleLabel.setScale(1+0.1f*MathUtils.sin(stateTime*2.5f));
+        subtitleLabel.setScale(1+0.05f*MathUtils.sin(stateTime*3f));
 
         UIBatch.begin();
         titleFont.setColor(Color.WHITE);
