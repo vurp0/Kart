@@ -21,7 +21,7 @@ import com.badlogic.gdx.utils.Align;
 /**
  * Main menu screen
  */
-public class MainMenuScreen extends UIScreen implements Screen, InputProcessor, ControllerListener {
+public class TitleScreen extends UIScreen implements Screen, InputProcessor, ControllerListener {
     private BitmapFont titleFont;
     private Group titleLabel;
 
@@ -31,7 +31,7 @@ public class MainMenuScreen extends UIScreen implements Screen, InputProcessor, 
     private float stateTime;
 
 
-    public MainMenuScreen(KartGame game) {
+    public TitleScreen(KartGame game) {
         super(game);
     }
 
@@ -67,8 +67,8 @@ public class MainMenuScreen extends UIScreen implements Screen, InputProcessor, 
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
-        titleLabel.setRotation(MathUtils.sin(stateTime*1.8f)*4f);
-        subtitleLabel.setScale(1+0.05f*MathUtils.sin(stateTime*3f));
+        //titleLabel.setRotation(MathUtils.sin(stateTime*1.8f)*4f);
+        //subtitleLabel.setScale(1+0.05f*MathUtils.sin(stateTime*3f));
 
         UIBatch.begin();
         titleFont.setColor(Color.WHITE);
@@ -121,7 +121,10 @@ public class MainMenuScreen extends UIScreen implements Screen, InputProcessor, 
 
     @Override
     public boolean buttonDown(Controller controller, int buttonCode) {
-        game.setScreen(game.gameControllerSelectScreen);
+        ControllerGameController gameController = new ControllerGameController(controller);
+        Controllers.addListener(gameController);
+        game.setKartGameController(gameController);
+        game.startGame();
         return true;
     }
 
@@ -157,7 +160,11 @@ public class MainMenuScreen extends UIScreen implements Screen, InputProcessor, 
 
     @Override
     public boolean keyDown(int keycode) {
-        game.setScreen(game.gameControllerSelectScreen);
+
+        KeyboardGameController controller = new KeyboardGameController();
+        game.multiplexer.addProcessor(controller);
+        game.setKartGameController(controller);
+        game.startGame();
         return true;
     }
 

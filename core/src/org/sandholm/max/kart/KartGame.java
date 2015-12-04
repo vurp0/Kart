@@ -1,30 +1,29 @@
 package org.sandholm.max.kart;
 
 import com.badlogic.gdx.*;
-import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.Controllers;
 
 /**
  * Created by max on 23.9.2015.
  */
 public class KartGame extends Game {
+    public enum Flow{TITLE_SCREEN,KART_SELECT_SCREEN,MAP_SELECT_SCREEN,GAME_SCREEN,RESULTS_SCREEN};
+
     InputMultiplexer multiplexer;
 
     KartScreen kartScreen;
     GameController kartGameController;
 
-    GameControllerSelectScreen gameControllerSelectScreen;
-    MainMenuScreen mainMenuScreen;
+    TitleScreen titleScreen;
 
     @Override
     public void create() {
         multiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(multiplexer);
-        gameControllerSelectScreen = new GameControllerSelectScreen(this);
-        mainMenuScreen = new MainMenuScreen(this);
-        multiplexer.addProcessor(mainMenuScreen);
-        Controllers.addListener(mainMenuScreen);
-        setScreen(mainMenuScreen);
+        titleScreen = new TitleScreen(this);
+        multiplexer.addProcessor(titleScreen);
+        Controllers.addListener(titleScreen);
+        setScreen(titleScreen);
         System.out.println(Controllers.getControllers());
     }
 
@@ -41,11 +40,13 @@ public class KartGame extends Game {
         //Controllers.addListener((ControllerListener)screen);
     }
 
+    public void transitionTo(Flow flow) {
+
+        //TODO
+    }
+
     public void startGame() {
         kartScreen = new KartScreen(this);
-        gameControllerSelectScreen.dispose();
-        multiplexer.removeProcessor(gameControllerSelectScreen);
-        Controllers.removeListener(gameControllerSelectScreen);
         setScreen(kartScreen);
     }
 }

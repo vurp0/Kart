@@ -23,4 +23,8 @@ public class DumbAIGameController implements GameController {
     public boolean getDrifting() {
         return false;
     }
+
+    @Override
+    public void setMenuController(MenuController controller) {
+    }
 }
