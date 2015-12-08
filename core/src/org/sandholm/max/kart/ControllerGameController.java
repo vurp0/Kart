@@ -1,6 +1,5 @@
 package org.sandholm.max.kart;
 
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
@@ -10,7 +9,7 @@ import com.badlogic.gdx.math.Vector3;
  * Sorry about the ridiculous class name. A GameController which uses input from a LibGDX Controller.
  */
 public class ControllerGameController implements GameController,ControllerListener {
-    MenuController menuController;
+    UIController UIController;
     Controller controller;
 
     public ControllerGameController(Controller controller) {
@@ -37,9 +36,8 @@ public class ControllerGameController implements GameController,ControllerListen
         return controller.getButton(5);
     }
 
-    @Override
-    public void setMenuController(MenuController controller) {
-        menuController = controller;
+    public void setUIController(UIController controller) {
+        UIController = controller;
     }
 
     public Controller getController() {
@@ -60,17 +58,19 @@ public class ControllerGameController implements GameController,ControllerListen
     public boolean buttonDown(Controller controller, int buttonCode) {
         if (controller == this.controller) { //TODO: fix controller button mapping in a sensible way
             if (buttonCode == 1) {
-                menuController.upPressed();
+                UIController.upPressed();
             } else if (buttonCode == 2) {
-                menuController.downPressed();
+                UIController.downPressed();
             } else if (buttonCode == 3) {
-                menuController.leftPressed();
+                UIController.leftPressed();
             } else if (buttonCode == 4) {
-                menuController.rightPressed();
+                UIController.rightPressed();
             } else if (buttonCode == 5) {
-                menuController.OKPressed();
+                UIController.OKPressed();
             } else if (buttonCode == 6) {
-                menuController.backPressed();
+                UIController.backPressed();
+            } else if (buttonCode == 7) {
+                UIController.pausePressed();
             }
         }
         return false;

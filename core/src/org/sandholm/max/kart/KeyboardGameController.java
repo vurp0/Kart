@@ -8,7 +8,7 @@ import com.badlogic.gdx.InputProcessor;
  * GameController that reads input from keyboard to control a Kart
  */
 public class KeyboardGameController implements GameController, InputProcessor {
-    private MenuController menuController;
+    private UIController UIController;
 
     @Override
     public float getTurning() {
@@ -36,26 +36,35 @@ public class KeyboardGameController implements GameController, InputProcessor {
         return Gdx.input.isKeyPressed(Input.Keys.SPACE);
     }
 
-    @Override
-    public void setMenuController(MenuController controller) {
-        this.menuController = controller;
+    public void setUIController(UIController controller) {
+        this.UIController = controller;
     }
 
     //InputProcessor
     @Override
     public boolean keyDown(int keycode) {
-        if (keycode == Input.Keys.W) {
-            menuController.upPressed();
-        } else if (keycode == Input.Keys.S) {
-            menuController.downPressed();
-        } else if (keycode == Input.Keys.A) {
-            menuController.leftPressed();
-        } else if (keycode == Input.Keys.D) {
-            menuController.rightPressed();
-        } else if (keycode == Input.Keys.BACKSPACE) {
-            menuController.backPressed();
-        } else if (keycode == Input.Keys.ENTER) {
-            menuController.OKPressed();
+        switch (keycode) {
+            case Input.Keys.W:
+                UIController.upPressed();
+                break;
+            case Input.Keys.S:
+                UIController.downPressed();
+                break;
+            case Input.Keys.A:
+                UIController.leftPressed();
+                break;
+            case Input.Keys.D:
+                UIController.rightPressed();
+                break;
+            case Input.Keys.BACKSPACE:
+                UIController.backPressed();
+                break;
+            case Input.Keys.ENTER:
+                UIController.OKPressed();
+                break;
+            case Input.Keys.ESCAPE:
+                UIController.pausePressed();
+                break;
         }
         return false;
     }

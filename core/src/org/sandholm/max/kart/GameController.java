@@ -13,5 +13,5 @@ public interface GameController {
 
     boolean getDrifting();
 
-    void setMenuController(MenuController controller);
+    void setUIController(UIController controller);
 }

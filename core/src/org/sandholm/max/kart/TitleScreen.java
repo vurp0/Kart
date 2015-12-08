@@ -67,14 +67,10 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
-        //titleLabel.setRotation(MathUtils.sin(stateTime*1.8f)*4f);
-        //subtitleLabel.setScale(1+0.05f*MathUtils.sin(stateTime*3f));
-
         UIBatch.begin();
         titleFont.setColor(Color.WHITE);
         titleLabel.draw(UIBatch, 1);
         subtitleLabel.draw(UIBatch, 1);
-        //drawText(titleFont, UIBatch, "Epic Kart Racing Game", screenWidth/2, screenHeight/2, Anchor.CENTER);
         UIBatch.end();
 
 
@@ -121,10 +117,12 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
 
     @Override
     public boolean buttonDown(Controller controller, int buttonCode) {
+        game.multiplexer.clear();
+        Controllers.clearListeners();
         ControllerGameController gameController = new ControllerGameController(controller);
         Controllers.addListener(gameController);
         game.setKartGameController(gameController);
-        game.startGame();
+        game.transitionTo(KartGame.Flow.GAME_SCREEN);
         return true;
     }
 
@@ -160,11 +158,12 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
 
     @Override
     public boolean keyDown(int keycode) {
-
+        game.multiplexer.clear();
+        Controllers.clearListeners();
         KeyboardGameController controller = new KeyboardGameController();
         game.multiplexer.addProcessor(controller);
         game.setKartGameController(controller);
-        game.startGame();
+        game.transitionTo(KartGame.Flow.GAME_SCREEN);
         return true;
     }
 

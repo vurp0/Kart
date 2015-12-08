@@ -3,7 +3,7 @@ package org.sandholm.max.kart;
 /**
  * Created by max on 12/4/15.
  */
-public interface MenuController {
+public interface UIController {
 
     void upPressed();
     void downPressed();
@@ -11,4 +11,5 @@ public interface MenuController {
     void rightPressed();
     void OKPressed();
     void backPressed();
+    void pausePressed();
 }

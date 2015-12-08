@@ -24,7 +24,6 @@ public class DumbAIGameController implements GameController {
         return false;
     }
 
-    @Override
-    public void setMenuController(MenuController controller) {
+    public void setUIController(UIController controller) {
     }
 }

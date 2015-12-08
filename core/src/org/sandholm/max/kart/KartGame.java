@@ -11,7 +11,7 @@ public class KartGame extends Game {
 
     InputMultiplexer multiplexer;
 
-    KartScreen kartScreen;
+    KartGameScreen kartGameScreen;
     GameController kartGameController;
 
     TitleScreen titleScreen;
@@ -33,20 +33,34 @@ public class KartGame extends Game {
 
     @Override
     public void setScreen(Screen screen) {
-        multiplexer.clear();
-        Controllers.clearListeners();
         super.setScreen(screen);
-        //multiplexer.addProcessor((InputProcessor)screen);
-        //Controllers.addListener((ControllerListener)screen);
     }
 
     public void transitionTo(Flow flow) {
+        switch (flow) {
+            case TITLE_SCREEN:
+                setScreen(titleScreen);
+                break;
+            case KART_SELECT_SCREEN:
+                System.out.println("TODO: switch to kart select screen"); //TODO
+                break;
+            case MAP_SELECT_SCREEN:
+                System.out.println("TODO: switch to map select screen"); //TODO
+                break;
+            case GAME_SCREEN:
+                kartGameScreen = new KartGameScreen(this);
+                setScreen(kartGameScreen);
+                kartGameController.setUIController(kartGameScreen);
+                break;
+            case RESULTS_SCREEN:
+                System.out.println("TODO: switch to results screen"); //TODO
+                break;
 
-        //TODO
+        }
     }
 
-    public void startGame() {
-        kartScreen = new KartScreen(this);
-        setScreen(kartScreen);
-    }
+    /*public void startGame() {
+        kartGameScreen = new KartGameScreen(this);
+        setScreen(kartGameScreen);
+    }*/
 }

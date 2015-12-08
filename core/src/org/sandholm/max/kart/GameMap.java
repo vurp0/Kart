@@ -20,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Map;
 
 /**
- * Defines a level (track) with a spawn point, ground texture, etc.
+ * Defines a gameMap (track) with a spawn point, ground texture, etc.
  */
-public class Level {
+public class GameMap {
     static enum GroundType{SOLID, SLOW, HOLLOW};
 
     Texture groundTexture;
@@ -34,18 +34,18 @@ public class Level {
 
     TiledMap map;
 
-    public Level(String levelName) {
+    public GameMap(String levelName) {
         try {
             JSONParser parser = new JSONParser();
-            Map obj = (Map)parser.parse(Gdx.files.internal("levels/"+levelName+"/level.json").reader());
+            Map obj = (Map)parser.parse(Gdx.files.internal("maps/"+levelName+"/map.json").reader());
             spawnPoint = new Vector2(((Number)((Map)obj.get("spawn")).get("x")).floatValue(), ((Number)(((Map)obj.get("spawn")).get("y"))).floatValue());
             spawnRotation = ((Number)((Map)obj.get("spawn")).get("angle")).floatValue();
             scale = ((Number)obj.get("scale")).floatValue();
-            groundTexture = new Texture("levels/"+levelName+"/"+obj.get("ground"));
-            backgroundTexture = new Texture(Gdx.files.internal("levels/" + levelName + "/" + ((Map) obj.get("background")).get("file")));
+            groundTexture = new Texture("maps/"+levelName+"/"+obj.get("ground"));
+            backgroundTexture = new Texture(Gdx.files.internal("maps/" + levelName + "/" + ((Map) obj.get("background")).get("file")));
             backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
             backgroundRepetition = ((Number)((Map)obj.get("background")).get("repetition")).floatValue();
-            map = new TmxMapLoader().load("levels/"+levelName+"/"+obj.get("map"));
+            map = new TmxMapLoader().load("maps/"+levelName+"/"+obj.get("map"));
 
             
         } catch(Exception e) {
