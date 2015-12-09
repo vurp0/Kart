@@ -130,6 +130,8 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     @Override
     public void resize(int width, int height) {
         super.resize(width, height);
+        skyBatch.setProjectionMatrix(UIProjection);
+
         camera.viewportWidth = width/(float)height;
         camera.viewportHeight = 1;
 
