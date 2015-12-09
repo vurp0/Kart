@@ -3,15 +3,11 @@ package org.sandholm.max.kart;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.Model;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.ModelInstance;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.g3d.decals.Decal;
 import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
-import com.badlogic.gdx.graphics.g3d.model.Node;
-import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -34,12 +30,14 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     CameraGroupStrategy groupStrategy;
     DecalBatch decalBatch;
     Decal groundDecal;
-    ArrayList<Decal> kartDecal;
+    ArrayList<Decal> kartDecals;
 
-    ShaderProgram kartGameShader;
+    SpriteBatch skyBatch;
 
     Texture groundTexture;
     PerspectiveCamera camera;
+    ShaderProgram shader;
+
     float cameraFOV = 45f;
     float FOVIntensifier = 0f;
 
@@ -73,6 +71,12 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         camera.far = 10000f;
         camera.update();
 
+        String vertexShader = Gdx.files.internal("shaders/kartgame.vert").readString();
+        String fragmentShader = Gdx.files.internal("shaders/kartgame.frag").readString();
+
+        shader = new ShaderProgram(vertexShader, fragmentShader);
+        if (!shader.isCompiled()) throw new IllegalArgumentException("couldn't compile shader: " + shader.getLog());
+
         gameMap = new GameMap("testlevel");
 
         gameWorld = new World(Vector2.Zero, true);
@@ -82,14 +86,16 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         gameWorld.setContactListener(this);
 
 
-        groupStrategy = new KartGameCameraGroupStrategy(camera);
+        groupStrategy = new KartGameCameraGroupStrategy(camera, shader);
         decalBatch = new DecalBatch(groupStrategy);
         groundTexture = gameMap.getGroundTexture();
         groundDecal = Decal.newDecal(gameMap.getGroundTexture().getWidth() / gameMap.getScale(), gameMap.getGroundTexture().getHeight() / gameMap.getScale(), new TextureRegion(groundTexture));
         groundDecal.setPosition(groundDecal.getWidth()/2,groundDecal.getHeight()/2,0);
-        karts = new ArrayList<Kart>();
 
-        kartDecal = new ArrayList<Decal>();
+        skyBatch = new SpriteBatch();
+
+        karts = new ArrayList<Kart>();
+        kartDecals = new ArrayList<Decal>();
 
         otherKartController = new DumbAIGameController();
 
@@ -112,25 +118,13 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         }
 
         for (Kart k : karts) {
-            kartDecal.add(Decal.newDecal(1.28f, 1.28f, k.getTextureRegionFromAngle(k.getRotation()), true));
+            kartDecals.add(Decal.newDecal(1.28f, 1.28f, k.getTextureRegionFromAngle(k.getRotation()), true));
         }
 
         UIFont = generateFont(0.08f);
         shake = new Shake();
+        skyBatch.setShader(shader);
 
-
-    }
-
-    static Mesh newQuad(float width, float height) {
-        Mesh quad = new Mesh(true, 4, 6,
-                        new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"));
-
-        quad.setVertices(new float[] {
-                        -width/2, -height/2, 0,        //define counter clock wise vertices
-                        width/2, -height/2, 0,
-                        width/2, height/2, 0,
-                        -width/2, height/2, 0 });
-        return quad;
     }
 
     @Override
@@ -138,6 +132,10 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         super.resize(width, height);
         camera.viewportWidth = width/(float)height;
         camera.viewportHeight = 1;
+
+        shader.begin();
+        shader.setUniformf("u_resolution", width, height);
+        shader.end();
     }
 
     //TODO: this method could still be useful some day, and I should probably put it somewhere as a generic utility method
@@ -219,29 +217,29 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
-        UIBatch.begin();
+        skyBatch.begin();
         float rotatedOffset = (cameraAngle * gameMap.backgroundRepetition) / (360);
         float screenRepetitions = gameMap.backgroundRepetition*(camera.fieldOfView/360);
         float unitsPerDegree = screenRepetitions/camera.fieldOfView;
-        UIBatch.draw(gameMap.backgroundTexture, 0, 0, screenWidth, screenHeight,
+        skyBatch.draw(gameMap.backgroundTexture, 0, 0, screenWidth, screenHeight,
                 -0.5f*screenRepetitions- rotatedOffset,
                 0.5f+cameraVerticalAngle*unitsPerDegree*0.5f+((float)screenHeight/(float)screenWidth)*screenRepetitions*0.5f,
                 0.5f*screenRepetitions - rotatedOffset,
                 0.5f+cameraVerticalAngle*unitsPerDegree*0.5f-((float)screenHeight/(float)screenWidth)*screenRepetitions*0.5f);
-        UIBatch.end();
+        skyBatch.end();
 
         for (int i=0; i<karts.size(); i++) {
-            kartDecal.get(i).setTextureRegion(karts.get(i).getTextureRegionFromAngle(cameraAngle - karts.get(i).getRotation()));
-            kartDecal.get(i).setPosition(karts.get(i).getPosition().x, karts.get(i).getPosition().y, kartDecal.get(i).getHeight() / 2);
-            kartDecal.get(i).setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
-            decalBatch.add(kartDecal.get(i));
+            kartDecals.get(i).setTextureRegion(karts.get(i).getTextureRegionFromAngle(cameraAngle - karts.get(i).getRotation()));
+            kartDecals.get(i).setPosition(karts.get(i).getPosition().x, karts.get(i).getPosition().y, kartDecals.get(i).getHeight() / 2);
+            kartDecals.get(i).setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
+            decalBatch.add(kartDecals.get(i));
             karts.get(i).resetFrame();
         }
         decalBatch.add(groundDecal);
         decalBatch.flush();
 
         UIBatch.begin();
-        drawText(UIFont, UIBatch, "some text", screenWidth, 0, Anchor.SE);
+        drawText(UIFont, UIBatch, String.valueOf(Gdx.graphics.getFramesPerSecond())+" fps", screenWidth, 0, Anchor.SE);
         UIBatch.end();
     }
 

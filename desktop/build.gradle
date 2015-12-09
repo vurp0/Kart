@@ -15,15 +15,16 @@ task run(dependsOn: classes, type: JavaExec) {
 }
 
 task dist(type: Jar) {
+    manifest {
+        attributes 'Main-Class': project.mainClassName
+    }
     from files(sourceSets.main.output.classesDir)
     from files(sourceSets.main.output.resourcesDir)
     from {configurations.compile.collect {zipTree(it)}}
     from files(project.assetsDir);
 
-    manifest {
-        attributes 'Main-Class': project.mainClassName
-    }
 }
+
 
 task fatJar(type: Jar) {
     manifest {

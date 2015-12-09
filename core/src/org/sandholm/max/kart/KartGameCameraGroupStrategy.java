@@ -31,15 +31,17 @@ public class KartGameCameraGroupStrategy extends CameraGroupStrategy {
     Camera camera;
     ShaderProgram shader;
 
-    public KartGameCameraGroupStrategy (Camera camera) {
+    public KartGameCameraGroupStrategy (Camera camera, ShaderProgram shader) {
         super(camera);
         setCamera(camera);
-        createDefaultShader();
+        this.shader = shader;
+        //createDefaultShader();
     }
 
-    public KartGameCameraGroupStrategy (Camera camera, Comparator<Decal> sorter) {
+    public KartGameCameraGroupStrategy (Camera camera, Comparator<Decal> sorter, ShaderProgram shader) {
         super(camera, sorter);
-        createDefaultShader();
+        this.shader = shader;
+        //createDefaultShader();
 
     }
 
@@ -67,7 +69,7 @@ public class KartGameCameraGroupStrategy extends CameraGroupStrategy {
     public void beforeGroups () {
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
         shader.begin();
-        shader.setUniformMatrix("u_projectionViewMatrix", camera.combined);
+        shader.setUniformMatrix("u_projTrans", camera.combined);
         //shader.setUniformi("u_texture", 0);
     }
 
@@ -77,6 +79,7 @@ public class KartGameCameraGroupStrategy extends CameraGroupStrategy {
         Gdx.gl.glDisable(GL20.GL_DEPTH_TEST);
     }
 
+    /*NOT USED:
     private void createDefaultShader () {
         /*String vertexShader = "attribute vec4 " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
                 + "attribute vec4 " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
@@ -90,7 +93,7 @@ public class KartGameCameraGroupStrategy extends CameraGroupStrategy {
                 + "   v_color = " + ShaderProgram.COLOR_ATTRIBUTE + ";\n" //
                 + "   v_texCoords = " + ShaderProgram.TEXCOORD_ATTRIBUTE + "0;\n" //
                 + "   gl_Position =  u_projectionViewMatrix * " + ShaderProgram.POSITION_ATTRIBUTE + ";\n" //
-                + "}\n";*/
+                + "}\n"; * /
         String vertexShader = Gdx.files.internal("shaders/blackwhite.vert").readString();
         /*String fragmentShader = "#ifdef GL_ES\n" //
                 + "precision mediump float;\n" //
@@ -101,12 +104,12 @@ public class KartGameCameraGroupStrategy extends CameraGroupStrategy {
                 + "void main()\n"//
                 + "{\n" //
                 + "  gl_FragColor = v_color * texture2D(u_texture, v_texCoords);\n" //
-                + "}";*/
+                + "}"; * /
         String fragmentShader = Gdx.files.internal("shaders/blackwhite.frag").readString();
 
         shader = new ShaderProgram(vertexShader, fragmentShader);
         if (shader.isCompiled() == false) throw new IllegalArgumentException("couldn't compile shader: " + shader.getLog());
-    }
+    }*/
 
     @Override
     public ShaderProgram getGroupShader (int group) {
