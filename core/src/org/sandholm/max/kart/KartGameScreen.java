@@ -175,10 +175,9 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
             k.update(deltaTime);
         }
 
-
         gameWorld.step(deltaTime, 6, 2);
 
-
+        FOVIntensifier = cameraFollowKart.getBody().getLinearVelocity().len()*0.9f;
         cameraAngle = MathUtils.radiansToDegrees * MathUtils.lerpAngle(MathUtils.degreesToRadians * cameraAngle, MathUtils.degreesToRadians * cameraFollowKart.getRotation(), 0.06f);
         camera.fieldOfView = MathUtils.lerp(camera.fieldOfView, cameraFOV + FOVIntensifier, 0.1f);
         cameraVerticalAngle = 10;
