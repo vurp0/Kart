@@ -221,14 +221,15 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
         skyBatch.begin();
-        float rotatedOffset = (cameraAngle * gameMap.backgroundRepetition) / (360);
-        float screenRepetitions = gameMap.backgroundRepetition*(camera.fieldOfView/360);
-        float unitsPerDegree = screenRepetitions/camera.fieldOfView;
+        float aspectRatio = (float)screenHeight/screenWidth;
+        float rotatedOffset = (cameraAngle/360) * gameMap.backgroundRepetition;
+        float screenRepetitions = ((camera.fieldOfView/aspectRatio)/360f)*gameMap.backgroundRepetition;
+        float unitsPerDegree = (screenRepetitions*aspectRatio)/camera.fieldOfView;
         skyBatch.draw(gameMap.backgroundTexture, 0, 0, screenWidth, screenHeight,
                 -0.5f*screenRepetitions- rotatedOffset,
-                0.5f+cameraVerticalAngle*unitsPerDegree*0.5f+((float)screenHeight/(float)screenWidth)*screenRepetitions*0.5f,
+                0.5f+((camera.fieldOfView*unitsPerDegree)/2 + cameraVerticalAngle*unitsPerDegree),
                 0.5f*screenRepetitions - rotatedOffset,
-                0.5f+cameraVerticalAngle*unitsPerDegree*0.5f-((float)screenHeight/(float)screenWidth)*screenRepetitions*0.5f);
+                0.5f-((camera.fieldOfView*unitsPerDegree)/2 - cameraVerticalAngle*unitsPerDegree));
         skyBatch.end();
 
         for (int i=0; i<karts.size(); i++) {
