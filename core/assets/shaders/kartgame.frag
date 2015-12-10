@@ -26,5 +26,7 @@ void main() {
 
         texColor.rgb = mix(texColor.rgb, texColor.rgb * vignette, 0.5);
 
-        gl_FragColor = texColor * FILTER_COLOR * v_color;
+        vec4 tmpColor = vec4((texColor.r*0.8+texColor.g*0.1+texColor.b*0.1),(texColor.r*0.1+texColor.g*0.8+texColor.b*0.1),(texColor.r*0.1+texColor.g*0.1+texColor.b*0.8),texColor.a);
+
+        gl_FragColor = tmpColor * v_color;
 }

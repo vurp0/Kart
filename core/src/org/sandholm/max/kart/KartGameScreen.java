@@ -13,6 +13,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
+import org.sandholm.max.kart.gamecontroller.DumbAIGameController;
 
 import java.util.ArrayList;
 
@@ -94,8 +95,8 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
         skyBatch = new SpriteBatch();
 
-        karts = new ArrayList<Kart>();
-        kartDecals = new ArrayList<Decal>();
+        karts = new ArrayList<>();
+        kartDecals = new ArrayList<>();
 
         otherKartController = new DumbAIGameController();
 

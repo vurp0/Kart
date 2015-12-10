@@ -54,7 +54,7 @@ project(":core") {
         compile "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
         compile "com.googlecode.json-simple:json-simple:1.1.1"
         compile "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
-
+        compile fileTree(dir: '../libs', include: '*.jar')
     }
 }
 

@@ -1,4 +1,6 @@
-package org.sandholm.max.kart;
+package org.sandholm.max.kart.gamecontroller;
+
+import org.sandholm.max.kart.UIController;
 
 /**
  * Dumb AI game controller, does nothing but constantly accelerate and turn left.

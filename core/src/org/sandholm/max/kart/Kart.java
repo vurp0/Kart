@@ -7,11 +7,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import org.json.simple.parser.JSONParser;
+import org.sandholm.max.kart.gamecontroller.GameController;
 
-import java.io.FileReader;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 public class Kart {
     static float FRICTION_S = 2f;

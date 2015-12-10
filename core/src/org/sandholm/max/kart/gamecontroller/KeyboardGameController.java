@@ -1,14 +1,15 @@
-package org.sandholm.max.kart;
+package org.sandholm.max.kart.gamecontroller;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
+import org.sandholm.max.kart.UIController;
 
 /**
  * GameController that reads input from keyboard to control a Kart
  */
 public class KeyboardGameController implements GameController, InputProcessor {
-    private UIController UIController;
+    private org.sandholm.max.kart.UIController UIController;
 
     @Override
     public float getTurning() {

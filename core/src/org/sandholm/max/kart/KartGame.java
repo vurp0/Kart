@@ -2,12 +2,13 @@ package org.sandholm.max.kart;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.controllers.Controllers;
+import org.sandholm.max.kart.gamecontroller.GameController;
 
 /**
  * Created by max on 23.9.2015.
  */
 public class KartGame extends Game {
-    public enum Flow{TITLE_SCREEN,KART_SELECT_SCREEN,MAP_SELECT_SCREEN,GAME_SCREEN,RESULTS_SCREEN};
+    public enum Flow{TITLE_SCREEN,MAIN_MENU_SCREEN,KART_MAP_SELECT_SCREEN,GAME_SCREEN,RESULTS_SCREEN};
 
     InputMultiplexer multiplexer;
 
@@ -41,11 +42,10 @@ public class KartGame extends Game {
             case TITLE_SCREEN:
                 setScreen(titleScreen);
                 break;
-            case KART_SELECT_SCREEN:
-                System.out.println("TODO: switch to kart select screen"); //TODO
-                break;
-            case MAP_SELECT_SCREEN:
-                System.out.println("TODO: switch to map select screen"); //TODO
+            case MAIN_MENU_SCREEN:
+                System.out.println("TODO: switch to main menu screen");
+            case KART_MAP_SELECT_SCREEN:
+                System.out.println("TODO: switch to kart&map select screen"); //TODO
                 break;
             case GAME_SCREEN:
                 kartGameScreen = new KartGameScreen(this);

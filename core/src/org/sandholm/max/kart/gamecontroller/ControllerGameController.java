@@ -1,15 +1,16 @@
-package org.sandholm.max.kart;
+package org.sandholm.max.kart.gamecontroller;
 
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.math.Vector3;
+import org.sandholm.max.kart.UIController;
 
 /**
  * Sorry about the ridiculous class name. A GameController which uses input from a LibGDX Controller.
  */
 public class ControllerGameController implements GameController,ControllerListener {
-    UIController UIController;
+    org.sandholm.max.kart.UIController UIController;
     Controller controller;
 
     public ControllerGameController(Controller controller) {

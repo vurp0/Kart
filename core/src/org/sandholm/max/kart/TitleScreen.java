@@ -10,13 +10,12 @@ import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
+import org.sandholm.max.kart.gamecontroller.ControllerGameController;
+import org.sandholm.max.kart.gamecontroller.KeyboardGameController;
 
 /**
  * Main menu screen
@@ -40,7 +39,7 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
         stateTime = 0f;
         titleFont = generateFont(0.13f);
         titleLabel = new Group();
-        Label tmpTitleLabel = new Label("Epic Kart Racing Game", new Label.LabelStyle(titleFont, Color.WHITE));
+        Label tmpTitleLabel = new Label("Game", new Label.LabelStyle(titleFont, Color.WHITE));
         tmpTitleLabel.setPosition(0,0,Align.center);
         titleLabel.addActor(tmpTitleLabel);
         titleLabel.setPosition(screenWidth*0.5f, screenHeight*0.6f, Align.center);
