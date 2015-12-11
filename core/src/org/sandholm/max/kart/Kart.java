@@ -162,7 +162,7 @@ public class Kart {
         } else {
             rotation += driftingSpeed*amount*deltaTime;
             rotation = (rotation % 360 + 360) % 360;
-            pBody.applyForceToCenter(new Vector2(2f*amount, 0f).rotate(rotation+90), true);
+            pBody.applyForceToCenter(new Vector2(-15f*pBody.getLinearVelocity().len()*amount, 0f).rotate(rotation+90), true);
             pBody.setLinearDamping(friction-(1f*Math.abs(amount)));
         }
     }

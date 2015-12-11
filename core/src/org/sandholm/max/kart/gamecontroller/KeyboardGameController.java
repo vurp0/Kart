@@ -34,7 +34,7 @@ public class KeyboardGameController implements GameController, InputProcessor {
 
     @Override
     public boolean getDrifting() {
-        return Gdx.input.isKeyPressed(Input.Keys.SPACE);
+        return Gdx.input.isKeyPressed(Input.Keys.CONTROL_RIGHT);
     }
 
     public void setUIController(UIController controller) {

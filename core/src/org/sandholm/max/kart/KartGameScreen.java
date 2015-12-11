@@ -1,5 +1,6 @@
 package org.sandholm.max.kart;
 
+import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -13,7 +14,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Timer;
 import org.sandholm.max.kart.gamecontroller.DumbAIGameController;
+import org.sandholm.max.kart.tweenaccessors.KartGameScreenAccessor;
 
 import java.util.ArrayList;
 
@@ -42,6 +45,9 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     float cameraFOV = 45f;
     float FOVIntensifier = 0f;
 
+
+    float darkness = 0f;
+
     Shake shake;
 
     GameMap gameMap;
@@ -58,10 +64,6 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     public KartGameScreen(KartGame game) {
         super(game);
-    }
-
-    @Override
-    public void show() {
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
@@ -74,12 +76,10 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
         String vertexShader = Gdx.files.internal("shaders/kartgame.vert").readString();
         String fragmentShader = Gdx.files.internal("shaders/kartgame.frag").readString();
-
         shader = new ShaderProgram(vertexShader, fragmentShader);
         if (!shader.isCompiled()) throw new IllegalArgumentException("couldn't compile shader: " + shader.getLog());
 
         gameMap = new GameMap("testlevel");
-
         gameWorld = new World(Vector2.Zero, true);
 
         Body worldBody = gameMap.createBody(gameWorld);
@@ -125,6 +125,19 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         UIFont = generateFont(0.08f);
         shake = new Shake();
         skyBatch.setShader(shader);
+    }
+
+    @Override
+    public void show() {
+
+
+        updateCamera(0);
+
+        Timer.schedule(new Timer.Task() {
+            @Override
+            public void run() {
+            }
+        }, 2f);
 
     }
 
@@ -165,11 +178,13 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
                 startingRender(deltaTime);
                 break;
         }
+        game.tweenManager.update(deltaTime);
+        System.out.println(deltaTime);
     }
 
     public void gameRender(float deltaTime) {
-        runningStateTime += deltaTime;
 
+        runningStateTime += deltaTime;
 
         for (Kart k : karts) {
             k.update(deltaTime);
@@ -177,6 +192,62 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
         gameWorld.step(deltaTime, 6, 2);
 
+        updateCamera(deltaTime);
+
+        drawKartScene();
+    }
+
+
+
+    public void pausingRender(float deltaTime) {
+        drawKartScene();
+    }
+    class PausingTweenCallback implements TweenCallback {
+        @Override
+        public void onEvent(int eventType, BaseTween<?> source) {
+            switch (eventType) {
+                case TweenCallback.COMPLETE:
+                    gameState = GameState.PAUSED;
+            }
+        }
+    }
+
+    public void pausedRender(float deltaTime) {
+        drawKartScene();
+
+    }
+
+    public void unpausingRender(float deltaTime) {
+        drawKartScene();
+    }
+    class UnpausingTweenCallback implements TweenCallback {
+        @Override
+        public void onEvent(int eventType, BaseTween<?> source) {
+            switch (eventType) {
+                case TweenCallback.COMPLETE:
+                    gameState = GameState.RUNNING;
+            }
+        }
+    }
+
+    private boolean startingTweenStarted = false;
+    public void startingRender(float deltaTime) {
+        drawKartScene();
+        if (!startingTweenStarted && deltaTime < 1f/30f) {
+            startingTweenStarted = true;
+            Tween.to(this, KartGameScreenAccessor.DARKNESS, 1.5f).target(1f).ease(TweenEquations.easeOutQuart).start(game.tweenManager).setCallback(new StartingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
+        }
+    }
+    class StartingTweenCallback implements TweenCallback {
+        @Override
+        public void onEvent(int eventType, BaseTween<?> source) {
+            if (eventType == TweenCallback.COMPLETE) {
+                gameState = GameState.RUNNING;
+            }
+        }
+    }
+
+    public void updateCamera(float deltaTime) {
         FOVIntensifier = cameraFollowKart.getBody().getLinearVelocity().len()*0.9f;
         cameraAngle = MathUtils.radiansToDegrees * MathUtils.lerpAngle(MathUtils.degreesToRadians * cameraAngle, MathUtils.degreesToRadians * cameraFollowKart.getRotation(), 0.06f);
         camera.fieldOfView = MathUtils.lerp(camera.fieldOfView, cameraFOV + FOVIntensifier, 0.1f);
@@ -189,32 +260,13 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         shake.update(deltaTime, camera, camera.position);
         camera.update();
 
-        drawKartScene();
     }
 
-
-
-    public void pausingRender(float deltaTime) {
-        gameState = GameState.PAUSED; //TODO: transition from running into paused mode
-        drawKartScene();
-    }
-
-    public void pausedRender(float deltaTime) {
-        drawKartScene();
-
-    }
-
-    public void unpausingRender(float deltaTime) {
-        gameState = GameState.RUNNING; //TODO: transition from paused into running mode
-        drawKartScene();
-    }
-
-    public void startingRender(float deltaTime) {
-        gameState = GameState.RUNNING; //TODO: beginning snimation, then start game
-        drawKartScene();
-
-    }
     public void drawKartScene() {
+        shader.begin();
+        shader.setUniformf("fadeDark", getDarkness());
+        shader.end();
+
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
@@ -264,6 +316,14 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     @Override
     public void dispose() {
 
+    }
+
+    public float getDarkness() {
+        return darkness;
+    }
+
+    public void setDarkness(float darkness) {
+        this.darkness = darkness;
     }
 
     //***
@@ -359,9 +419,14 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     public void pausePressed() {
         if (gameState == GameState.RUNNING) {
             gameState = GameState.PAUSING;
+            Tween.to(this, KartGameScreenAccessor.DARKNESS, 0.5f).target(0.5f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new PausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
         } else if (gameState == GameState.PAUSED) {
             gameState = GameState.UNPAUSING;
+            Tween.to(this, KartGameScreenAccessor.DARKNESS, 0.5f).target(1f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new UnpausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
         }
 
     }
+
+
+
 }

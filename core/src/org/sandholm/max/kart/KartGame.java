@@ -1,8 +1,11 @@
 package org.sandholm.max.kart;
 
+import aurelienribon.tweenengine.Tween;
+import aurelienribon.tweenengine.TweenManager;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.controllers.Controllers;
 import org.sandholm.max.kart.gamecontroller.GameController;
+import org.sandholm.max.kart.tweenaccessors.KartGameScreenAccessor;
 
 /**
  * Created by max on 23.9.2015.
@@ -17,8 +20,14 @@ public class KartGame extends Game {
 
     TitleScreen titleScreen;
 
+    TweenManager tweenManager;
+
     @Override
     public void create() {
+        tweenManager = new TweenManager();
+        Tween.setCombinedAttributesLimit(1);
+        Tween.registerAccessor(KartGameScreen.class, new KartGameScreenAccessor());
+
         multiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(multiplexer);
         titleScreen = new TitleScreen(this);

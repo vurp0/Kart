@@ -7,12 +7,13 @@
 const float VIGNETTE_OUTER_RADIUS = 0.75;
 const float VIGNETTE_INNER_RADIUS = 0.3;
 
-const vec3 FILTER_COLOR = vec3(1, 0.9, 0.65);
+const vec3 FILTER_COLOR = vec3(1, 0.87, 0.62);
 const vec3 MIX_COLORS   = vec3(0, 0, 0); //mix RG, GB, RB
 const float BRIGHTNESS  = 0.1;
 
 uniform mat4 u_projTrans;
 uniform vec2 u_resolution;
+uniform float fadeDark;
 uniform sampler2D u_texture;
 
 varying vec4 v_color;
@@ -36,6 +37,6 @@ void main() {
 
         tmpColor += BRIGHTNESS;
 
-        gl_FragColor.rgb = tmpColor.rgb * v_color.rgb;
+        gl_FragColor.rgb = tmpColor.rgb * v_color.rgb * fadeDark;
         gl_FragColor.a = texColor.a;
 }
