@@ -5,6 +5,7 @@ import com.badlogic.gdx.*;
 import com.badlogic.gdx.controllers.Controllers;
 import org.sandholm.max.kart.gamecontroller.GameController;
 import org.sandholm.max.kart.screens.KartGameScreen;
+import org.sandholm.max.kart.screens.MainMenuScreen;
 import org.sandholm.max.kart.screens.TitleScreen;
 import org.sandholm.max.kart.screens.UIScreen;
 import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
@@ -54,7 +55,9 @@ public class KartGame extends Game {
                 setScreen(titleScreen);
                 break;
             case MAIN_MENU_SCREEN:
-                System.out.println("TODO: switch to main menu screen");
+                MainMenuScreen mainMenuScreen = new MainMenuScreen(this);
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, 2f).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(mainMenuScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
+                kartGameController.setUIController(mainMenuScreen);
             case KART_MAP_SELECT_SCREEN:
                 System.out.println("TODO: switch to kart&map select screen"); //TODO
                 break;

@@ -42,7 +42,7 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
     public void show() {
         stateTime = 0f;
 
-        backgroundTexture = new Texture(Gdx.files.internal("maps/testlevel/background.png"));
+        backgroundTexture = new Texture(Gdx.files.internal("maps/testlevel/background.png")); //TODO: get a real background here, not this hardcoded placeholder
 
         titleFont = generateFont(0.13f);
         titleLabel = new Group();
@@ -131,7 +131,7 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
         ControllerGameController gameController = new ControllerGameController(controller);
         Controllers.addListener(gameController);
         game.setKartGameController(gameController);
-        game.transitionTo(KartGame.Flow.GAME_SCREEN);
+        game.transitionTo(KartGame.Flow.MAIN_MENU_SCREEN);
         return true;
     }
 
@@ -172,7 +172,7 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
         KeyboardGameController controller = new KeyboardGameController();
         game.multiplexer.addProcessor(controller);
         game.setKartGameController(controller);
-        game.transitionTo(KartGame.Flow.GAME_SCREEN);
+        game.transitionTo(KartGame.Flow.MAIN_MENU_SCREEN);
         return true;
     }
 

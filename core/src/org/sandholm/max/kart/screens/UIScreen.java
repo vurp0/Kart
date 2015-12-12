@@ -92,10 +92,6 @@ abstract public class UIScreen {
 
     }
 
-    /*public void startFadeOut(TweenCallback callback) {
-        Tween.to(this, UIScreenAccessor.FULL_SCREEN_DARKNESS, 2f).target(0f).ease(TweenEquations.easeOutQuart).start(game.tweenManager).setCallback(callback).setCallbackTriggers(TweenCallback.COMPLETE);
-    }*/
-
     public void resize(int width, int height){
         screenWidth = width;
         screenHeight = height;
