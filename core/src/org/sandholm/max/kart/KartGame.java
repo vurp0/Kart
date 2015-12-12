@@ -1,11 +1,13 @@
 package org.sandholm.max.kart;
 
-import aurelienribon.tweenengine.Tween;
-import aurelienribon.tweenengine.TweenManager;
+import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.controllers.Controllers;
 import org.sandholm.max.kart.gamecontroller.GameController;
-import org.sandholm.max.kart.tweenaccessors.KartGameScreenAccessor;
+import org.sandholm.max.kart.screens.KartGameScreen;
+import org.sandholm.max.kart.screens.TitleScreen;
+import org.sandholm.max.kart.screens.UIScreen;
+import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
 
 /**
  * Created by max on 23.9.2015.
@@ -13,20 +15,20 @@ import org.sandholm.max.kart.tweenaccessors.KartGameScreenAccessor;
 public class KartGame extends Game {
     public enum Flow{TITLE_SCREEN,MAIN_MENU_SCREEN,KART_MAP_SELECT_SCREEN,GAME_SCREEN,RESULTS_SCREEN};
 
-    InputMultiplexer multiplexer;
+    public InputMultiplexer multiplexer;
 
     KartGameScreen kartGameScreen;
-    GameController kartGameController;
+    public GameController kartGameController;
 
     TitleScreen titleScreen;
 
-    TweenManager tweenManager;
+    public TweenManager tweenManager;
 
     @Override
     public void create() {
         tweenManager = new TweenManager();
         Tween.setCombinedAttributesLimit(1);
-        Tween.registerAccessor(KartGameScreen.class, new KartGameScreenAccessor());
+        Tween.registerAccessor(UIScreen.class, new UIScreenAccessor());
 
         multiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(multiplexer);
@@ -58,13 +60,30 @@ public class KartGame extends Game {
                 break;
             case GAME_SCREEN:
                 kartGameScreen = new KartGameScreen(this);
-                setScreen(kartGameScreen);
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, 2f).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(kartGameScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
+                //((UIScreen) getScreen()).startFadeOut();
                 kartGameController.setUIController(kartGameScreen);
                 break;
             case RESULTS_SCREEN:
                 System.out.println("TODO: switch to results screen"); //TODO
                 break;
 
+        }
+    }
+
+    class SwitchScreenCallback implements TweenCallback {
+        Screen screen;
+
+        public SwitchScreenCallback(Screen screen) {
+            this.screen = screen;
+        }
+
+        @Override
+        public void onEvent(int eventType, BaseTween<?> baseTween) {
+            if (eventType == TweenCallback.COMPLETE) {
+                getScreen().dispose();
+                setScreen(screen);
+            }
         }
     }
 

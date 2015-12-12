@@ -1,4 +1,4 @@
-package org.sandholm.max.kart;
+package org.sandholm.max.kart.screens;
 
 import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.*;
@@ -15,8 +15,9 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Timer;
+import org.sandholm.max.kart.*;
 import org.sandholm.max.kart.gamecontroller.DumbAIGameController;
-import org.sandholm.max.kart.tweenaccessors.KartGameScreenAccessor;
+import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
 
 import java.util.ArrayList;
 
@@ -42,11 +43,28 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     PerspectiveCamera camera;
     ShaderProgram shader;
 
+    float gameSceneDarkness = 0f;
+
+    @Override
+    public float getFullScreenDarkness() {
+        return UIDarkness;
+    }
+    @Override
+    public void setFullScreenDarkness(float darkness) {
+        this.gameSceneDarkness = darkness;
+        this.UIDarkness = darkness;
+    }
+    @Override
+    public float getBackgroundDarkness() {
+        return gameSceneDarkness;
+    }
+    @Override
+    public void setBackgroundDarkness(float darkness) {
+        this.gameSceneDarkness = darkness;
+    }
+
     float cameraFOV = 45f;
     float FOVIntensifier = 0f;
-
-
-    float darkness = 0f;
 
     Shake shake;
 
@@ -64,6 +82,10 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     public KartGameScreen(KartGame game) {
         super(game);
+    }
+
+    @Override
+    public void show() {
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
@@ -78,6 +100,8 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         String fragmentShader = Gdx.files.internal("shaders/kartgame.frag").readString();
         shader = new ShaderProgram(vertexShader, fragmentShader);
         if (!shader.isCompiled()) throw new IllegalArgumentException("couldn't compile shader: " + shader.getLog());
+
+        UIDarkness = 0f;
 
         gameMap = new GameMap("testlevel");
         gameWorld = new World(Vector2.Zero, true);
@@ -125,11 +149,6 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         UIFont = generateFont(0.08f);
         shake = new Shake();
         skyBatch.setShader(shader);
-    }
-
-    @Override
-    public void show() {
-
 
         updateCamera(0);
 
@@ -161,6 +180,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     @Override
     public void render(float deltaTime) {
+        super.render(deltaTime);
         switch (gameState) {
             case RUNNING:
                 gameRender(deltaTime);
@@ -178,7 +198,6 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
                 startingRender(deltaTime);
                 break;
         }
-        game.tweenManager.update(deltaTime);
     }
 
     public void gameRender(float deltaTime) {
@@ -229,21 +248,12 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         }
     }
 
-    private boolean startingTweenStarted = false;
     public void startingRender(float deltaTime) {
         drawKartScene();
-        if (!startingTweenStarted && deltaTime < 1f/30f) {
-            startingTweenStarted = true;
-            Tween.to(this, KartGameScreenAccessor.DARKNESS, 1.5f).target(1f).ease(TweenEquations.easeOutQuart).start(game.tweenManager).setCallback(new StartingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
-        }
     }
-    class StartingTweenCallback implements TweenCallback {
-        @Override
-        public void onEvent(int eventType, BaseTween<?> source) {
-            if (eventType == TweenCallback.COMPLETE) {
-                gameState = GameState.RUNNING;
-            }
-        }
+    @Override
+    public void fadeInEnded() {
+        gameState = GameState.RUNNING;
     }
 
     public void updateCamera(float deltaTime) {
@@ -263,7 +273,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     public void drawKartScene() {
         shader.begin();
-        shader.setUniformf("fadeDark", getDarkness());
+        shader.setUniformf("fadeDark", getBackgroundDarkness());
         shader.end();
 
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
@@ -315,14 +325,6 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     @Override
     public void dispose() {
 
-    }
-
-    public float getDarkness() {
-        return darkness;
-    }
-
-    public void setDarkness(float darkness) {
-        this.darkness = darkness;
     }
 
     //***
@@ -418,10 +420,10 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     public void pausePressed() {
         if (gameState == GameState.RUNNING) {
             gameState = GameState.PAUSING;
-            Tween.to(this, KartGameScreenAccessor.DARKNESS, 0.5f).target(0.5f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new PausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
+            Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(0.5f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new PausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
         } else if (gameState == GameState.PAUSED) {
             gameState = GameState.UNPAUSING;
-            Tween.to(this, KartGameScreenAccessor.DARKNESS, 0.5f).target(1f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new UnpausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
+            Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(1f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new UnpausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
         }
 
     }

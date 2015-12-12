@@ -1,4 +1,4 @@
-package org.sandholm.max.kart;
+package org.sandholm.max.kart.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
@@ -9,16 +9,19 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.controllers.PovDirection;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
+import org.sandholm.max.kart.KartGame;
 import org.sandholm.max.kart.gamecontroller.ControllerGameController;
 import org.sandholm.max.kart.gamecontroller.KeyboardGameController;
 
 /**
- * Main menu screen
+ * Title screen
+ * This class also detects the type of input and creates an appropriate GameController for use in the game
  */
 public class TitleScreen extends UIScreen implements Screen, InputProcessor, ControllerListener {
     private BitmapFont titleFont;
@@ -27,8 +30,9 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
     private BitmapFont subTitleFont;
     private Group subtitleLabel;
 
-    private float stateTime;
+    private Texture backgroundTexture;
 
+    private float stateTime;
 
     public TitleScreen(KartGame game) {
         super(game);
@@ -37,6 +41,9 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
     @Override
     public void show() {
         stateTime = 0f;
+
+        backgroundTexture = new Texture(Gdx.files.internal("maps/testlevel/background.png"));
+
         titleFont = generateFont(0.13f);
         titleLabel = new Group();
         Label tmpTitleLabel = new Label("Game", new Label.LabelStyle(titleFont, Color.WHITE));
@@ -58,20 +65,23 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
 
     }
 
-    @Override
-    public void render(float delta) {
-        stateTime += delta;
 
-        Gdx.gl.glClearColor(0.4f, 0.5f, 1f, 1f);
+    @Override
+    public void render(float deltaTime) {
+        super.render(deltaTime);
+
+        stateTime += deltaTime;
+
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
         UIBatch.begin();
+        UIBatch.draw(backgroundTexture, 0, 0, screenWidth, screenHeight);
         titleFont.setColor(Color.WHITE);
         titleLabel.draw(UIBatch, 1);
         subtitleLabel.draw(UIBatch, 1);
         UIBatch.end();
-
 
     }
 

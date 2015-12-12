@@ -23,14 +23,14 @@ import java.util.Map;
  * Defines a gameMap (track) with a spawn point, ground texture, etc.
  */
 public class GameMap {
-    static enum GroundType{SOLID, SLOW, HOLLOW};
+    public enum GroundType{SOLID, SLOW, HOLLOW};
 
-    Texture groundTexture;
-    Texture backgroundTexture;
-    float backgroundRepetition;
-    Vector2 spawnPoint;
-    float spawnRotation;
-    float scale; //pixels per meter
+    public Texture groundTexture;
+    public Texture backgroundTexture;
+    public float backgroundRepetition;
+    public Vector2 spawnPoint;
+    public float spawnRotation;
+    public float scale; //pixels per meter
 
     TiledMap map;
 

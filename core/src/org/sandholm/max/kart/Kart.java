@@ -13,7 +13,7 @@ import java.util.Map;
 
 public class Kart {
     static float FRICTION_S = 2f;
-    int currentContacts;
+    public int currentContacts;
 
     float friction;
 
