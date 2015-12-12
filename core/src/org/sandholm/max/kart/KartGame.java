@@ -58,6 +58,7 @@ public class KartGame extends Game {
                 MainMenuScreen mainMenuScreen = new MainMenuScreen(this);
                 Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, 2f).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(mainMenuScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
                 kartGameController.setUIController(mainMenuScreen);
+                break;
             case KART_MAP_SELECT_SCREEN:
                 System.out.println("TODO: switch to kart&map select screen"); //TODO
                 break;
