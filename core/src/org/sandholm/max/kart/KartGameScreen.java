@@ -179,7 +179,6 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
                 break;
         }
         game.tweenManager.update(deltaTime);
-        System.out.println(deltaTime);
     }
 
     public void gameRender(float deltaTime) {
