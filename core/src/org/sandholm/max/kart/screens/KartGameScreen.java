@@ -6,9 +6,10 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.g3d.ModelBatch;
+import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
-import com.badlogic.gdx.graphics.g3d.decals.Decal;
-import com.badlogic.gdx.graphics.g3d.decals.DecalBatch;
+import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -33,15 +34,19 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     static float CAMERA_HEIGHT = 4f;
 
     CameraGroupStrategy groupStrategy;
-    DecalBatch decalBatch;
-    Decal groundDecal;
-    ArrayList<Decal> kartDecals;
+    //DecalBatch decalBatch;
+    ModelBatch quadBatch;
+    //Decal groundDecal;
+    //ArrayList<Decal> kartDecals;
+
+    BaseQuad groundQuad;
+    ArrayList<BaseQuad> kartQuads;
 
     SpriteBatch skyBatch;
 
     Texture groundTexture;
     PerspectiveCamera camera;
-    ShaderProgram shader;
+    ShaderProgram shaderProgram;
 
     float gameSceneDarkness = 0f;
 
@@ -98,8 +103,9 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
         String vertexShader = Gdx.files.internal("shaders/kartgame.vert").readString();
         String fragmentShader = Gdx.files.internal("shaders/kartgame.frag").readString();
-        shader = new ShaderProgram(vertexShader, fragmentShader);
-        if (!shader.isCompiled()) throw new IllegalArgumentException("couldn't compile shader: " + shader.getLog());
+        shaderProgram = new ShaderProgram(vertexShader, fragmentShader);
+        if (!shaderProgram.isCompiled()) throw new IllegalArgumentException("couldn't compile shader: " + shaderProgram.getLog());
+
 
         UIDarkness = 0f;
 
@@ -110,17 +116,22 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         worldBody.setTransform(0,0,0);
         gameWorld.setContactListener(this);
 
-
-        groupStrategy = new KartGameCameraGroupStrategy(camera, shader);
-        decalBatch = new DecalBatch(groupStrategy);
+        //groupStrategy = new KartGameCameraGroupStrategy(camera, shaderProgram);
+        //decalBatch = new DecalBatch(groupStrategy);
+        quadBatch = new ModelBatch();
         groundTexture = gameMap.getGroundTexture();
-        groundDecal = Decal.newDecal(gameMap.getGroundTexture().getWidth() / gameMap.getScale(), gameMap.getGroundTexture().getHeight() / gameMap.getScale(), new TextureRegion(groundTexture));
-        groundDecal.setPosition(groundDecal.getWidth()/2,groundDecal.getHeight()/2,0);
+        //groundDecal = Decal.newDecal(gameMap.getGroundTexture().getWidth() / gameMap.getScale(), gameMap.getGroundTexture().getHeight() / gameMap.getScale(), new TextureRegion(groundTexture));
+        groundQuad = new BaseQuad(new TextureRegion(groundTexture), gameMap.getGroundTexture().getWidth() / gameMap.getScale(), gameMap.getGroundTexture().getHeight() / gameMap.getScale());
+        groundQuad.worldTransform.setToTranslation(groundQuad.getWidth()/2,groundQuad.getHeight()/2,0);
+        //groundDecal.setPosition();
+        Shader shader = new DefaultShader(groundQuad, new DefaultShader.Config(vertexShader, fragmentShader));
+        //shader
 
         skyBatch = new SpriteBatch();
 
         karts = new ArrayList<>();
-        kartDecals = new ArrayList<>();
+        //kartDecals = new ArrayList<>();
+        kartQuads = new ArrayList<>();
 
         otherKartController = new DumbAIGameController();
 
@@ -143,12 +154,13 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         }
 
         for (Kart k : karts) {
-            kartDecals.add(Decal.newDecal(1.28f, 1.28f, k.getTextureRegionFromAngle(k.getRotation()), true));
+            //kartDecals.add(Decal.newDecal(1.28f, 1.28f, k.getTextureRegionFromAngle(k.getRotation()), true));
+            kartQuads.add(new BaseQuad(k.getTextureRegionFromAngle(k.getRotation()), 1.28f, 1.28f));
         }
 
         UIFont = generateFont(0.08f);
         shake = new Shake();
-        skyBatch.setShader(shader);
+        skyBatch.setShader(shaderProgram);
 
         updateCamera(0);
 
@@ -168,9 +180,9 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         camera.viewportWidth = width/(float)height;
         camera.viewportHeight = 1;
 
-        shader.begin();
-        shader.setUniformf("u_resolution", width, height);
-        shader.end();
+        shaderProgram.begin();
+        shaderProgram.setUniformf("u_resolution", width, height);
+        shaderProgram.end();
     }
 
     //TODO: this method could still be useful some day, and I should probably put it somewhere as a generic utility method
@@ -272,9 +284,9 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     }
 
     public void drawKartScene() {
-        shader.begin();
-        shader.setUniformf("fadeDark", getBackgroundDarkness());
-        shader.end();
+        shaderProgram.begin();
+        shaderProgram.setUniformf("fadeDark", getBackgroundDarkness());
+        shaderProgram.end();
 
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -292,15 +304,24 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
                 0.5f-((camera.fieldOfView*unitsPerDegree)/2 - cameraVerticalAngle*unitsPerDegree));
         skyBatch.end();
 
+        quadBatch.begin(camera);
         for (int i=0; i<karts.size(); i++) {
-            kartDecals.get(i).setTextureRegion(karts.get(i).getTextureRegionFromAngle(cameraAngle - karts.get(i).getRotation()));
+            /*kartDecals.get(i).setTextureRegion(karts.get(i).getTextureRegionFromAngle(cameraAngle - karts.get(i).getRotation()));
             kartDecals.get(i).setPosition(karts.get(i).getPosition().x, karts.get(i).getPosition().y, kartDecals.get(i).getHeight() / 2);
             kartDecals.get(i).setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
-            decalBatch.add(kartDecals.get(i));
+            decalBatch.add(kartDecals.get(i));*/
+            kartQuads.get(i).setTextureRegion(karts.get(i).getTextureRegionFromAngle(cameraAngle - karts.get(i).getRotation()));
+            kartQuads.get(i).worldTransform.setToTranslation(karts.get(i).getPosition().x, karts.get(i).getPosition().y, kartQuads.get(i).getHeight() / 2);
+            kartQuads.get(i).setDecalRotation(camera.direction.cpy().scl(-1), Vector3.Z);
+            //kartQuads.get(i).worldTransform.rotate(camera.up.cpy().rotate(camera.direction, 90), 90);
+            //kartQuads.get(i).worldTransform.setToRotation(Vector3.Z, cameraAngle-90);
+            quadBatch.render(kartQuads.get(i));
             karts.get(i).resetFrame();
         }
-        decalBatch.add(groundDecal);
-        decalBatch.flush();
+        //decalBatch.add(groundDecal);
+        quadBatch.render(groundQuad);
+        quadBatch.end();
+        //decalBatch.flush();
 
         UIBatch.begin();
         drawText(UIFont, UIBatch, String.valueOf(Gdx.graphics.getFramesPerSecond())+" fps", screenWidth, 0, Anchor.SE);
@@ -324,7 +345,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     @Override
     public void dispose() {
-
+        quadBatch.dispose();
     }
 
     //***

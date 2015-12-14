@@ -12,6 +12,7 @@ const vec3 MIX_COLORS   = vec3(0, 0, 0); //mix RG, GB, RB
 const float BRIGHTNESS  = 0.1;
 
 uniform mat4 u_projTrans;
+uniform mat4 u_worldTrans;
 uniform vec2 u_resolution;
 uniform float fadeDark;
 uniform sampler2D u_texture;

@@ -5,6 +5,7 @@ attribute vec4 a_color;
 attribute vec2 a_texCoord0;
 
 uniform mat4 u_projTrans;
+uniform mat4 u_worldTrans;
 uniform vec2 u_resolution;
 
 varying vec4 v_color;
