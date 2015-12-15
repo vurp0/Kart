@@ -6,17 +6,20 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.Material;
 import com.badlogic.gdx.graphics.g3d.Renderable;
+import com.badlogic.gdx.graphics.g3d.RenderableProvider;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.math.Quaternion;
 import com.badlogic.gdx.math.Vector3;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.Pool;
 
 /**
  * Created by max on 13.12.2015.
  */
-public class BaseQuad extends Renderable implements Disposable {
+public class Quad implements Disposable, RenderableProvider {
     public float height;
 
     public float width;
@@ -39,12 +42,15 @@ public class BaseQuad extends Renderable implements Disposable {
 
     //Sprite sprite;
 
+    public Renderable renderable;
+
     Vector3 tmp;
     Vector3 tmp2;
 
     Quaternion rotation;
 
-    public BaseQuad(TextureRegion texture, float height, float width) {
+    public Quad(TextureRegion texture, float height, float width) {
+        renderable = new Renderable();
         this.height = height;
         this.width = width;
 
@@ -52,7 +58,7 @@ public class BaseQuad extends Renderable implements Disposable {
         tmp2 = new Vector3();
         rotation = new Quaternion();
 
-        material = new Material(
+        renderable.material = new Material(
                 TextureAttribute.createDiffuse(texture),
                 new BlendingAttribute(true, 1f),
                 FloatAttribute.createAlphaTest(0.5f)
@@ -71,24 +77,19 @@ public class BaseQuad extends Renderable implements Disposable {
                 -width/2,  height/2, 0,   0, 0, 1,   0, 0,
                 -width/2, -height/2, 0,   0, 0, 1,   0, 1,
                  width/2, -height/2, 0,   0, 0, 1,   1, 1,
-                 width/2,  height/2, 0,   0, 0, 1,   1, 0};/*,
+                 width/2,  height/2, 0,   0, 0, 1,   1, 0};
 
-                back[Batch.X1], back[Batch.Y1], 0, 0, 0, -1, back[Batch.U1], back[Batch.V1],
-                back[Batch.X2], back[Batch.Y2], 0, 0, 0, -1, back[Batch.U2], back[Batch.V2],
-                back[Batch.X3], back[Batch.Y3], 0, 0, 0, -1, back[Batch.U3], back[Batch.V3],
-                back[Batch.X4], back[Batch.Y4], 0, 0, 0, -1, back[Batch.U4], back[Batch.V4]
-        };*/
         short[] indices = new short[] {0, 1, 2, 2, 3, 0};//, 4, 5, 6, 6, 7, 4 };
 
         // FIXME: this Mesh needs to be disposed
-        meshPart.mesh = new Mesh(true, 4, 6, VertexAttribute.Position(), VertexAttribute.Normal(), VertexAttribute.TexCoords(0));
-        meshPart.mesh.setVertices(vertices);
-        meshPart.mesh.setIndices(indices);
+        renderable.meshPart.mesh = new Mesh(true, 4, 6, VertexAttribute.Position(), VertexAttribute.Normal(), VertexAttribute.TexCoords(0));
+        renderable.meshPart.mesh.setVertices(vertices);
+        renderable.meshPart.mesh.setIndices(indices);
 
-        meshPart.offset = 0;
-        meshPart.size = meshPart.mesh.getNumIndices();
-        meshPart.primitiveType = GL20.GL_TRIANGLES;
-        meshPart.update();
+        renderable.meshPart.offset = 0;
+        renderable.meshPart.size = renderable.meshPart.mesh.getNumIndices();
+        renderable.meshPart.primitiveType = GL20.GL_TRIANGLES;
+        renderable.meshPart.update();
 
     }
 
@@ -96,15 +97,15 @@ public class BaseQuad extends Renderable implements Disposable {
         tmp.set(up).crs(dir).nor();
         tmp2.set(dir).crs(tmp).nor();
         rotation.setFromAxes(tmp.x, tmp2.x, dir.x, tmp.y, tmp2.y, dir.y, tmp.z, tmp2.z, dir.z);
-        worldTransform.rotate(rotation);
+        renderable.worldTransform.rotate(rotation);
     }
 
     public void setTextureRegion(TextureRegion textureRegion) {
-        material.set(TextureAttribute.createDiffuse(textureRegion));
+        renderable.material.set(TextureAttribute.createDiffuse(textureRegion));
         //sprite.setRegion(textureRegion);
     }
 
-    private static float[] convert(float[] front, float[] back) {
+    /*private static float[] convert(float[] front, float[] back) {
         return new float[]{
                 front[Batch.X2], front[Batch.Y2], 0, 0, 0, 1, front[Batch.U2], front[Batch.V2],
                 front[Batch.X1], front[Batch.Y1], 0, 0, 0, 1, front[Batch.U1], front[Batch.V1],
@@ -116,11 +117,15 @@ public class BaseQuad extends Renderable implements Disposable {
                 back[Batch.X3], back[Batch.Y3], 0, 0, 0, -1, back[Batch.U3], back[Batch.V3],
                 back[Batch.X4], back[Batch.Y4], 0, 0, 0, -1, back[Batch.U4], back[Batch.V4]
         };
-    }
+    }*/
 
     @Override
     public void dispose() {
         //mesh.dispose();
     }
 
+    @Override
+    public void getRenderables(Array<Renderable> renderables, Pool<Renderable> pool) {
+        renderables.add(renderable);
+    }
 }

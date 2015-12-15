@@ -6,10 +6,16 @@ import com.badlogic.gdx.graphics.*;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.g3d.ModelBatch;
-import com.badlogic.gdx.graphics.g3d.Shader;
+import com.badlogic.gdx.graphics.g3d.*;
+import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
+import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
 import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
+import com.badlogic.gdx.graphics.g3d.model.MeshPart;
 import com.badlogic.gdx.graphics.g3d.shaders.DefaultShader;
+import com.badlogic.gdx.graphics.g3d.utils.DefaultShaderProvider;
+import com.badlogic.gdx.graphics.g3d.utils.ModelBuilder;
+import com.badlogic.gdx.graphics.g3d.utils.ShaderProvider;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -39,14 +45,15 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     //Decal groundDecal;
     //ArrayList<Decal> kartDecals;
 
-    BaseQuad groundQuad;
-    ArrayList<BaseQuad> kartQuads;
+    Quad groundQuad;
+    ArrayList<Quad> kartQuads;
 
     SpriteBatch skyBatch;
 
-    Texture groundTexture;
+    //Texture groundTexture;
     PerspectiveCamera camera;
     ShaderProgram shaderProgram;
+    Shader shader;
 
     float gameSceneDarkness = 0f;
 
@@ -101,8 +108,10 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         camera.far = 10000f;
         camera.update();
 
-        String vertexShader = Gdx.files.internal("shaders/kartgame.vert").readString();
-        String fragmentShader = Gdx.files.internal("shaders/kartgame.frag").readString();
+        ShaderProgram.pedantic = false;
+
+        String vertexShader = Gdx.files.internal("shaders/renderablekartgame.vert").readString();
+        String fragmentShader = Gdx.files.internal("shaders/renderablekartgame.frag").readString();
         shaderProgram = new ShaderProgram(vertexShader, fragmentShader);
         if (!shaderProgram.isCompiled()) throw new IllegalArgumentException("couldn't compile shader: " + shaderProgram.getLog());
 
@@ -118,14 +127,26 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
         //groupStrategy = new KartGameCameraGroupStrategy(camera, shaderProgram);
         //decalBatch = new DecalBatch(groupStrategy);
-        quadBatch = new ModelBatch();
-        groundTexture = gameMap.getGroundTexture();
+        quadBatch = new ModelBatch(new KartGameShaderProvider(vertexShader, fragmentShader));
+        //ShaderProvider provider = ;
+        //shader = new KartGameShader(vertexShader, fragmentShader);
+        //shader.init();
+        //groundTexture = gameMap.getGroundTexture();
         //groundDecal = Decal.newDecal(gameMap.getGroundTexture().getWidth() / gameMap.getScale(), gameMap.getGroundTexture().getHeight() / gameMap.getScale(), new TextureRegion(groundTexture));
-        groundQuad = new BaseQuad(new TextureRegion(groundTexture), gameMap.getGroundTexture().getWidth() / gameMap.getScale(), gameMap.getGroundTexture().getHeight() / gameMap.getScale());
-        groundQuad.worldTransform.setToTranslation(groundQuad.getWidth()/2,groundQuad.getHeight()/2,0);
+        //groundQuad = new Quad(new TextureRegion(groundTexture), gameMap.getGroundTexture().getWidth() / gameMap.getScale(), gameMap.getGroundTexture().getHeight() / gameMap.getScale());
+        //groundQuad.worldTransform.setToTranslation(groundQuad.getWidth()/2,groundQuad.getHeight()/2,0);
         //groundDecal.setPosition();
-        Shader shader = new DefaultShader(groundQuad, new DefaultShader.Config(vertexShader, fragmentShader));
-        //shader
+/*        ModelBuilder modelBuilder = new ModelBuilder();
+        modelBuilder.begin();
+        /*modelBuilder.part(meshPart, new Material(
+                TextureAttribute.createDiffuse(new TextureRegion(gameMap.getGroundTexture()))
+        ));* /
+        modelBuilder.part("1", createQuad(new TextureRegion(gameMap.getGroundTexture()), gameMap.getGroundTexture().getWidth() / gameMap.getScale(), gameMap.getGroundTexture().getHeight() / gameMap.getScale()), GL20.GL_TRIANGLES, new Material("1", TextureAttribute.createDiffuse(gameMap.getGroundTexture())));
+        Model quadModel = modelBuilder.end();
+        groundModelInstance = new ModelInstance(quadModel);
+        groundModelInstance.transform.setToTranslation((gameMap.getGroundTexture().getWidth() / gameMap.getScale())/2, (gameMap.getGroundTexture().getHeight() / gameMap.getScale())/2,0);
+*/
+        groundQuad = new Quad(new TextureRegion(gameMap.getGroundTexture()), gameMap.getGroundTexture().getWidth() / gameMap.getScale(), gameMap.getGroundTexture().getHeight() / gameMap.getScale());
 
         skyBatch = new SpriteBatch();
 
@@ -155,7 +176,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
         for (Kart k : karts) {
             //kartDecals.add(Decal.newDecal(1.28f, 1.28f, k.getTextureRegionFromAngle(k.getRotation()), true));
-            kartQuads.add(new BaseQuad(k.getTextureRegionFromAngle(k.getRotation()), 1.28f, 1.28f));
+            kartQuads.add(new Quad(k.getTextureRegionFromAngle(k.getRotation()), 1.28f, 1.28f));
         }
 
         UIFont = generateFont(0.08f);
@@ -170,6 +191,26 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
             }
         }, 2f);
 
+    }
+
+    public static Mesh createQuad(TextureRegion textureRegion, float width, float height) {
+        float[] vertices = new float[] {
+                -width/2,  height/2, 0,  0,0,  //textureRegion.getU(), textureRegion.getV(),  // 0--3
+                -width/2, -height/2, 0,  0,1,  //textureRegion.getU(), textureRegion.getV2(), // |\ |
+                 width/2, -height/2, 0,  1,1,  //textureRegion.getU2(), textureRegion.getV2(),// | \|
+                 width/2,  height/2, 0,  1,0}; //textureRegion.getU2(), textureRegion.getV()};// 1--2
+
+        short[] indices = new short[] {0, 1, 2, 2, 3, 0};//, 4, 5, 6, 6, 7, 4 };
+
+        // FIXME: this Mesh needs to be disposed
+        Mesh mesh = new Mesh(true, 4, 6,
+                new VertexAttribute(VertexAttributes.Usage.Position, 3, "a_position"),
+                new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord0"));//VertexAttribute.Position(), VertexAttribute.Normal(), VertexAttribute.TexCoords(0));
+        mesh.setVertices(vertices);
+        mesh.setIndices(indices);
+        mesh.setAutoBind(true);
+
+        return mesh;
     }
 
     @Override
@@ -288,7 +329,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         shaderProgram.setUniformf("fadeDark", getBackgroundDarkness());
         shaderProgram.end();
 
-        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
+        Gdx.gl.glClearColor(1f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
@@ -311,7 +352,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
             kartDecals.get(i).setRotation(camera.direction.cpy().scl(-1), Vector3.Z);
             decalBatch.add(kartDecals.get(i));*/
             kartQuads.get(i).setTextureRegion(karts.get(i).getTextureRegionFromAngle(cameraAngle - karts.get(i).getRotation()));
-            kartQuads.get(i).worldTransform.setToTranslation(karts.get(i).getPosition().x, karts.get(i).getPosition().y, kartQuads.get(i).getHeight() / 2);
+            kartQuads.get(i).renderable.worldTransform.setToTranslation(karts.get(i).getPosition().x, karts.get(i).getPosition().y, kartQuads.get(i).getHeight() / 2);
             kartQuads.get(i).setDecalRotation(camera.direction.cpy().scl(-1), Vector3.Z);
             //kartQuads.get(i).worldTransform.rotate(camera.up.cpy().rotate(camera.direction, 90), 90);
             //kartQuads.get(i).worldTransform.setToRotation(Vector3.Z, cameraAngle-90);

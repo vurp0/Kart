@@ -40,4 +40,5 @@ void main() {
 
         gl_FragColor.rgb = tmpColor.rgb * v_color.rgb * fadeDark;
         gl_FragColor.a = texColor.a;
+        //gl_FragColor = texture2D(u_texture, v_texCoords);
 }
