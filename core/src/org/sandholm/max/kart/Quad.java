@@ -59,9 +59,9 @@ public class Quad implements Disposable, RenderableProvider {
         rotation = new Quaternion();
 
         renderable.material = new Material(
-                TextureAttribute.createDiffuse(texture),
-                new BlendingAttribute(true, 1f),
-                FloatAttribute.createAlphaTest(0.5f)
+                TextureAttribute.createDiffuse(texture)
+                , new BlendingAttribute(true, 1f)
+                , FloatAttribute.createAlphaTest(0.5f)
         );
 
         /*sprite = new Sprite(texture); //TODO: Fix this, don't use a sprite, actually fix the entire class so it's not just a copy of Xoppa's tutorial
@@ -74,15 +74,15 @@ public class Quad implements Disposable, RenderableProvider {
             System.out.println(verts[i] + "    " + verts[i+1] + "    " + verts[i+2] + "    " + verts[i+3] + "    " + verts[i+4] + "    " + verts[i+5] + "    " + verts[i+6] + "    " + verts[i+7]);
         }*/
         float[] vertices = new float[] {
-                -width/2,  height/2, 0,   0, 0, 1,   0, 0,
-                -width/2, -height/2, 0,   0, 0, 1,   0, 1,
-                 width/2, -height/2, 0,   0, 0, 1,   1, 1,
-                 width/2,  height/2, 0,   0, 0, 1,   1, 0};
+                -width/2,  height/2, 0,  /* 0, 0, 1,*/   0, 0,
+                -width/2, -height/2, 0,  /* 0, 0, 1,*/   0, 1,
+                 width/2, -height/2, 0,  /* 0, 0, 1,*/   1, 1,
+                 width/2,  height/2, 0,  /* 0, 0, 1,*/   1, 0};
 
         short[] indices = new short[] {0, 1, 2, 2, 3, 0};//, 4, 5, 6, 6, 7, 4 };
 
         // FIXME: this Mesh needs to be disposed
-        renderable.meshPart.mesh = new Mesh(true, 4, 6, VertexAttribute.Position(), VertexAttribute.Normal(), VertexAttribute.TexCoords(0));
+        renderable.meshPart.mesh = new Mesh(true, 4, 6, VertexAttribute.Position(), /*VertexAttribute.Normal(),*/ VertexAttribute.TexCoords(0));
         renderable.meshPart.mesh.setVertices(vertices);
         renderable.meshPart.mesh.setIndices(indices);
 
@@ -101,7 +101,8 @@ public class Quad implements Disposable, RenderableProvider {
     }
 
     public void setTextureRegion(TextureRegion textureRegion) {
-        renderable.material.set(TextureAttribute.createDiffuse(textureRegion));
+        //renderable.material.set(TextureAttribute.createDiffuse(textureRegion));
+        ((TextureAttribute)renderable.material.get(TextureAttribute.Diffuse)).set(textureRegion);
         //sprite.setRegion(textureRegion);
     }
 

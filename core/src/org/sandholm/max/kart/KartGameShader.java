@@ -1,19 +1,3 @@
-/*******************************************************************************
- * Copyright 2011 See AUTHORS file.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- ******************************************************************************/
-
 package org.sandholm.max.kart;
 
 import com.badlogic.gdx.Gdx;
@@ -23,30 +7,20 @@ import com.badlogic.gdx.graphics.VertexAttribute;
 import com.badlogic.gdx.graphics.VertexAttributes.Usage;
 import com.badlogic.gdx.graphics.g3d.Attribute;
 import com.badlogic.gdx.graphics.g3d.Attributes;
-import com.badlogic.gdx.graphics.g3d.Environment;
 import com.badlogic.gdx.graphics.g3d.Renderable;
 import com.badlogic.gdx.graphics.g3d.Shader;
 import com.badlogic.gdx.graphics.g3d.attributes.BlendingAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.ColorAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.CubemapAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.DepthTestAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.DirectionalLightsAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.FloatAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.IntAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.PointLightsAttribute;
-import com.badlogic.gdx.graphics.g3d.attributes.SpotLightsAttribute;
 import com.badlogic.gdx.graphics.g3d.attributes.TextureAttribute;
-import com.badlogic.gdx.graphics.g3d.environment.AmbientCubemap;
-import com.badlogic.gdx.graphics.g3d.environment.DirectionalLight;
-import com.badlogic.gdx.graphics.g3d.environment.PointLight;
-import com.badlogic.gdx.graphics.g3d.environment.SpotLight;
 import com.badlogic.gdx.graphics.g3d.shaders.BaseShader;
 import com.badlogic.gdx.graphics.g3d.utils.RenderContext;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix3;
 import com.badlogic.gdx.math.Matrix4;
-import com.badlogic.gdx.math.Vector3;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 
 public class KartGameShader extends BaseShader {
@@ -98,7 +72,7 @@ public class KartGameShader extends BaseShader {
         public final static Uniform diffuseColor = new Uniform("u_diffuseColor", ColorAttribute.Diffuse);
         public final static Uniform diffuseTexture = new Uniform("u_diffuseTexture", TextureAttribute.Diffuse);
         public final static Uniform diffuseUVTransform = new Uniform("u_diffuseUVTransform", TextureAttribute.Diffuse);
-        public final static Uniform specularColor = new Uniform("u_specularColor", ColorAttribute.Specular);
+/*        public final static Uniform specularColor = new Uniform("u_specularColor", ColorAttribute.Specular);
         public final static Uniform specularTexture = new Uniform("u_specularTexture", TextureAttribute.Specular);
         public final static Uniform specularUVTransform = new Uniform("u_specularUVTransform", TextureAttribute.Specular);
         public final static Uniform emissiveColor = new Uniform("u_emissiveColor", ColorAttribute.Emissive);
@@ -110,14 +84,14 @@ public class KartGameShader extends BaseShader {
         public final static Uniform normalTexture = new Uniform("u_normalTexture", TextureAttribute.Normal);
         public final static Uniform normalUVTransform = new Uniform("u_normalUVTransform", TextureAttribute.Normal);
         public final static Uniform ambientTexture = new Uniform("u_ambientTexture", TextureAttribute.Ambient);
-        public final static Uniform ambientUVTransform = new Uniform("u_ambientUVTransform", TextureAttribute.Ambient);
+        public final static Uniform ambientUVTransform = new Uniform("u_ambientUVTransform", TextureAttribute.Ambient);*/
         public final static Uniform alphaTest = new Uniform("u_alphaTest");
 
-        public final static Uniform ambientCube = new Uniform("u_ambientCubemap");
+/*        public final static Uniform ambientCube = new Uniform("u_ambientCubemap");
         public final static Uniform dirLights = new Uniform("u_dirLights");
         public final static Uniform pointLights = new Uniform("u_pointLights");
         public final static Uniform spotLights = new Uniform("u_spotLights");
-        public final static Uniform environmentCubemap = new Uniform("u_environmentCubemap");
+        public final static Uniform environmentCubemap = new Uniform("u_environmentCubemap");*/
     }
 
     public static class Setters {
@@ -235,7 +209,7 @@ public class KartGameShader extends BaseShader {
                 shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
             }
         };
-        public final static Setter specularColor = new LocalSetter() {
+/*        public final static Setter specularColor = new LocalSetter() {
             @Override
             public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, ((ColorAttribute)(combinedAttributes.get(ColorAttribute.Specular))).color);
@@ -327,8 +301,8 @@ public class KartGameShader extends BaseShader {
                 final TextureAttribute ta = (TextureAttribute)(combinedAttributes.get(TextureAttribute.Ambient));
                 shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
             }
-        };
-
+        };*/
+/*
         public static class ACubemap extends LocalSetter {
             private final static float ones[] = {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1};
             private final AmbientCubemap cacheAmbientCubemap = new AmbientCubemap();
@@ -367,9 +341,9 @@ public class KartGameShader extends BaseShader {
                     shader.program.setUniform3fv(shader.loc(inputID), cacheAmbientCubemap.data, 0, cacheAmbientCubemap.data.length);
                 }
             }
-        }
+        }*/
 
-        public final static Setter environmentCubemap = new LocalSetter() {
+/*        public final static Setter environmentCubemap = new LocalSetter() {
             @Override
             public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
                 if (combinedAttributes.has(CubemapAttribute.EnvironmentMap)) {
@@ -377,7 +351,7 @@ public class KartGameShader extends BaseShader {
                             .get(CubemapAttribute.EnvironmentMap)).textureDescription));
                 }
             }
-        };
+        };*/
     }
 
     private static String defaultVertexShader = null;
@@ -396,8 +370,7 @@ public class KartGameShader extends BaseShader {
         return defaultFragmentShader;
     }
 
-    protected static long implementedFlags = BlendingAttribute.Type | TextureAttribute.Diffuse | ColorAttribute.Diffuse
-            | ColorAttribute.Specular | FloatAttribute.Shininess;
+    protected static long implementedFlags = BlendingAttribute.Type | TextureAttribute.Diffuse | ColorAttribute.Diffuse;
 
     /** @deprecated Replaced by {@link Config#defaultCullFace} Set to 0 to disable culling */
     @Deprecated public static int defaultCullFace = GL20.GL_BACK;
@@ -706,9 +679,10 @@ public class KartGameShader extends BaseShader {
 
     @Override
     public boolean canRender (final Renderable renderable) {
-        final Attributes attributes = combineAttributes(renderable);
+        /*final Attributes attributes = combineAttributes(renderable);
         return (attributesMask == (attributes.getMask() | optionalAttributes))
-                && (vertexMask == renderable.meshPart.mesh.getVertexAttributes().getMask()) && (renderable.environment != null) == false;//lighting;
+                && (vertexMask == renderable.meshPart.mesh.getVertexAttributes().getMask()) && (renderable.environment != null) == false;//lighting;*/
+        return true;
     }
 
     @Override
@@ -726,11 +700,11 @@ public class KartGameShader extends BaseShader {
     public boolean equals (KartGameShader obj) {
         return (obj == this);
     }
-
+/*
     private Matrix3 normalMatrix = new Matrix3();
-    private Camera camera;
+    private Camera camera;*/
     private float time;
-    private boolean lightsSet;
+/*    private boolean lightsSet;*/
 
     @Override
     public void begin (final Camera camera, final RenderContext context) {
@@ -742,15 +716,17 @@ public class KartGameShader extends BaseShader {
             pointLight.set(0, 0, 0, 0, 0, 0, 0);
         for (final SpotLight spotLight : spotLights)
             spotLight.set(0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0);*/
-        lightsSet = false;
+/*        lightsSet = false;*/
+        context.setDepthTest(GL20.GL_LEQUAL);
+        context.setCullFace(GL20.GL_BACK);
 
         if (has(u_time)) set(u_time, time += Gdx.graphics.getDeltaTime());
     }
 
     @Override
     public void render (Renderable renderable, Attributes combinedAttributes) {
-        if (!combinedAttributes.has(BlendingAttribute.Type))
-            context.setBlending(false, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        //if (!combinedAttributes.has(BlendingAttribute.Type))
+            //context.setBlending(false, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
         bindMaterial(combinedAttributes);
 //        if (lighting) bindLights(renderable, combinedAttributes);
         super.render(renderable, combinedAttributes);
@@ -791,9 +767,11 @@ public class KartGameShader extends BaseShader {
         context.setDepthMask(depthMask);
     }
 
+/*
     private final Vector3 tmpV1 = new Vector3();
+*/
 
-    protected void bindLights (final Renderable renderable, final Attributes attributes) {
+/*    protected void bindLights (final Renderable renderable, final Attributes attributes) {
         final Environment lights = renderable.environment;
         final DirectionalLightsAttribute dla = attributes.get(DirectionalLightsAttribute.class, DirectionalLightsAttribute.Type);
         final Array<DirectionalLight> dirs = dla == null ? null : dla.lights;
@@ -802,7 +780,7 @@ public class KartGameShader extends BaseShader {
         final SpotLightsAttribute sla = attributes.get(SpotLightsAttribute.class, SpotLightsAttribute.Type);
         final Array<SpotLight> spots = sla == null ? null : sla.lights;
 
-/*        if (dirLightsLoc >= 0) {
+*//*        if (dirLightsLoc >= 0) {
             for (int i = 0; i < directionalLights.length; i++) {
                 if (dirs == null || i >= dirs.size) {
                     if (lightsSet && directionalLights[i].color.r == 0f && directionalLights[i].color.g == 0f
@@ -863,8 +841,8 @@ public class KartGameShader extends BaseShader {
                     program.setUniformf(idx + spotLightsIntensityOffset, spotLights[i].intensity);
                 if (spotLightsSize <= 0) break;
             }
-        }*/
-/*
+        }*//*
+*//*
         if (attributes.has(ColorAttribute.Fog)) {
             set(u_fogColor, ((ColorAttribute)attributes.get(ColorAttribute.Fog)).color);
         }
@@ -873,10 +851,10 @@ public class KartGameShader extends BaseShader {
             set(u_shadowMapProjViewTrans, lights.shadowMap.getProjViewTrans());
             set(u_shadowTexture, lights.shadowMap.getDepthMap());
             set(u_shadowPCFOffset, 1.f / (2f * lights.shadowMap.getDepthMap().texture.getWidth()));
-        }*/
+        }*//*
 
         lightsSet = true;
-    }
+    }*/
 
     @Override
     public void dispose () {
