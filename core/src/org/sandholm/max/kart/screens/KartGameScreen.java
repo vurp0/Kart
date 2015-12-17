@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
+import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -31,6 +32,8 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     static float CAMERA_HEIGHT = 4f;
 
+    //CameraGroupStrategy groupStrategy;
+    //DecalBatch decalBatch;
     ModelBatch quadBatch;
 
     Quad groundQuad;
@@ -38,8 +41,10 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     SpriteBatch skyBatch;
 
+    //Texture groundTexture;
     PerspectiveCamera camera;
-    ShaderProgram shaderProgram;
+    ShaderProgram skyBatchShaderProgram;
+    Shader quadShader;
 
     ShaderProgram postProcShaderProgram;
     FrameBuffer frameBuffer1;
@@ -94,16 +99,17 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         camera = new PerspectiveCamera(cameraFOV, 1, h / w);
         camera.position.set(0f, 0f, 1f);
         camera.lookAt(0f, 1f, 1f);
-        camera.near = 0.1f;
-        camera.far = 10000f;
+        camera.near = 1f;
+        camera.far = 1000f;
         camera.update();
 
         ShaderProgram.pedantic = false;
 
-        String vertexShader = Gdx.files.internal("shaders/kartgame.vert").readString();
-        String fragmentShader = Gdx.files.internal("shaders/kartgame.frag").readString();
-        shaderProgram = new ShaderProgram(vertexShader, fragmentShader);
-        if (!shaderProgram.isCompiled()) throw new IllegalArgumentException("couldn't compile shader: " + shaderProgram.getLog());
+
+        String skyBatchVertexShader = Gdx.files.internal("shaders/kartgame.vert").readString();
+        String skyBatchFragmentShader = Gdx.files.internal("shaders/kartgame.frag").readString();
+        skyBatchShaderProgram = new ShaderProgram(skyBatchVertexShader, skyBatchFragmentShader);
+        if (!skyBatchShaderProgram.isCompiled()) throw new IllegalArgumentException("couldn't compile shader: " + skyBatchShaderProgram.getLog());
 
         String postProcVertexShader = Gdx.files.internal("shaders/kartgame.postproc.vert").readString();
         String postProcFragmentShader = Gdx.files.internal("shaders/kartgame.postproc.frag").readString();
@@ -126,6 +132,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         groundQuad = new Quad(new TextureRegion(gameMap.getGroundTexture()), gameMap.getGroundTexture().getWidth() / gameMap.getScale(), gameMap.getGroundTexture().getHeight() / gameMap.getScale());
+        groundQuad.renderable.worldTransform.setToTranslation(groundQuad.getWidth()/2,groundQuad.getHeight()/2,0);
 
         skyBatch = new SpriteBatch();
 
@@ -158,7 +165,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
         UIFont = generateFont(0.08f);
         shake = new Shake();
-        skyBatch.setShader(shaderProgram);
+        skyBatch.setShader(skyBatchShaderProgram);
 
         updateCamera(0);
 
@@ -178,9 +185,9 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         camera.viewportWidth = width/(float)height;
         camera.viewportHeight = 1;
 
-        shaderProgram.begin();
-        shaderProgram.setUniformf("u_resolution", width, height);
-        shaderProgram.end();
+        skyBatchShaderProgram.begin();
+        skyBatchShaderProgram.setUniformf("u_resolution", width, height);
+        skyBatchShaderProgram.end();
     }
 
     //TODO: this method could still be useful some day, and I should probably put it somewhere as a generic utility method
@@ -332,11 +339,11 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     }
 
     public void drawKartScene() {
-        shaderProgram.begin();
-        shaderProgram.setUniformf("fadeDark", getBackgroundDarkness());
-        shaderProgram.end();
+        skyBatchShaderProgram.begin();
+        skyBatchShaderProgram.setUniformf("fadeDark", getBackgroundDarkness());
+        skyBatchShaderProgram.end();
 
-        Gdx.gl.glClearColor(1f, 0f, 0f, 1f);
+        Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
@@ -353,6 +360,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         skyBatch.end();
 
         quadBatch.begin(camera);
+        quadBatch.render(groundQuad);
         for (int i=0; i<karts.size(); i++) {
             kartQuads.get(i).setTextureRegion(karts.get(i).getTextureRegionFromAngle(cameraAngle - karts.get(i).getRotation()));
             kartQuads.get(i).renderable.worldTransform.setToTranslation(karts.get(i).getPosition().x, karts.get(i).getPosition().y, kartQuads.get(i).getHeight() / 2);
@@ -360,7 +368,6 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
             quadBatch.render(kartQuads.get(i));
             karts.get(i).resetFrame();
         }
-        quadBatch.render(groundQuad);
         quadBatch.end();
 
         UIBatch.begin();
@@ -394,7 +401,6 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     @Override
     public void beginContact(Contact contact) {
-
         if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
             if (contact.getFixtureB().getUserData() == GameMap.GroundType.SLOW) {
                 ((Kart)contact.getFixtureA().getBody().getUserData()).currentContacts += 1;
@@ -414,11 +420,11 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     public void endContact(Contact contact) {
         if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
             if (contact.getFixtureB().getUserData() == GameMap.GroundType.SLOW) {
-                ((Kart)contact.getFixtureA().getBody().getUserData()).currentContacts -= 1;
+                ((Kart) contact.getFixtureA().getBody().getUserData()).currentContacts -= 1;
             }
         } else if (contact.getFixtureB().getBody().getUserData() instanceof Kart) {
             if (contact.getFixtureA().getUserData() == GameMap.GroundType.SLOW) {
-                ((Kart)contact.getFixtureB().getBody().getUserData()).currentContacts -= 1;
+                ((Kart) contact.getFixtureB().getBody().getUserData()).currentContacts -= 1;
             }
         }
     }
