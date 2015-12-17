@@ -20,8 +20,8 @@ void main() {
         if (diffuse.a <= v_alphaTest)
             discard;
 
-    diffuse.rgb = diffuse.rgb * FILTER_COLOR;
-    diffuse.rgb += BRIGHTNESS;
+    /*diffuse.rgb = diffuse.rgb * FILTER_COLOR;
+    diffuse.rgb += BRIGHTNESS;*/
 
     gl_FragColor = diffuse;
 }

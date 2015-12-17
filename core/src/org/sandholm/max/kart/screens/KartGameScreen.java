@@ -185,9 +185,9 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         camera.viewportWidth = width/(float)height;
         camera.viewportHeight = 1;
 
-        skyBatchShaderProgram.begin();
-        skyBatchShaderProgram.setUniformf("u_resolution", width, height);
-        skyBatchShaderProgram.end();
+        postProcShaderProgram.begin();
+        postProcShaderProgram.setUniformf("u_resolution", width, height);
+        postProcShaderProgram.end();
     }
 
     //TODO: this method could still be useful some day, and I should probably put it somewhere as a generic utility method
@@ -298,12 +298,18 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
             drawKartScene();
         frameBuffer1.end();
 
+        postProcShaderProgram.begin();
+        postProcShaderProgram.setUniformf("fadeDark", getBackgroundDarkness());
+        postProcShaderProgram.end();
+
         frameBuffer1.getColorBufferTexture().bind();
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
             postProcShaderProgram.begin();
-                fullScreenMesh.render(postProcShaderProgram, GL20.GL_TRIANGLE_STRIP, 0, 4);
+                fullScreenMesh.render(postProcShaderProgram, GL20.GL_TRIANGLES);
             postProcShaderProgram.end();
+
+        drawUI();
     }
 
     public static Mesh createFullScreenQuad(){
@@ -313,35 +319,17 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
              1f, 1f,  1f, 1f,
             -1f, 1f,  0f, 1f
         };
-        /*int i = 0;
-        verts[i++] = -1.f; // x1
-        verts[i++] = -1.f; // y1
-        verts[i++] =  0.f; // u1
-        verts[i++] =  0.f; // v1
-        verts[i++] =  1.f; // x2
-        verts[i++] = -1.f; // y2
-        verts[i++] =  1.f; // u2
-        verts[i++] =  0.f; // v2
-        verts[i++] =  1.f; // x3
-        verts[i++] =  1.f; // y2
-        verts[i++] =  1.f; // u3
-        verts[i++] =  1.f; // v3
-        verts[i++] = -1.f; // x4
-        verts[i++] =  1.f; // y4
-        verts[i++] =  0.f; // u4
-        verts[i++] =  1.f; // v4*/
-        Mesh tmpMesh = new Mesh(true, 4, 0
-            , new VertexAttribute(VertexAttributes.Usage.Position, 2, "a_position")
-            , new VertexAttribute(VertexAttributes.Usage.TextureCoordinates
+        short[] indices = new short[] { 0, 1, 2, 2, 3, 0 };
+        Mesh tmpMesh = new Mesh(true, 4, 6
+                , new VertexAttribute(VertexAttributes.Usage.Position, 2, "a_position")
+                , new VertexAttribute(VertexAttributes.Usage.TextureCoordinates
                 , 2, "a_texCoord0"));
         tmpMesh.setVertices(verts);
+        tmpMesh.setIndices(indices);
         return tmpMesh;
     }
 
     public void drawKartScene() {
-        skyBatchShaderProgram.begin();
-        skyBatchShaderProgram.setUniformf("fadeDark", getBackgroundDarkness());
-        skyBatchShaderProgram.end();
 
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -370,9 +358,13 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         }
         quadBatch.end();
 
+    }
+
+    public void drawUI() {
         UIBatch.begin();
         drawText(UIFont, UIBatch, String.valueOf(Gdx.graphics.getFramesPerSecond())+" fps", screenWidth, 0, Anchor.SE);
         UIBatch.end();
+
     }
 
     @Override

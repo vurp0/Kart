@@ -21,7 +21,7 @@ varying vec4 v_color;
 varying vec2 v_texCoords;
 
 void main() {
-        vec4 texColor = texture2D(u_texture, v_texCoords);
+/*        vec4 texColor = texture2D(u_texture, v_texCoords);
 
         vec2 position = (gl_FragCoord.xy / u_resolution.xy) - vec2(0.5);
         float len = length(position);
@@ -39,6 +39,6 @@ void main() {
         tmpColor += BRIGHTNESS;
 
         gl_FragColor.rgb = tmpColor.rgb * v_color.rgb * fadeDark;
-        gl_FragColor.a = texColor.a;
-        //gl_FragColor = texture2D(u_texture, v_texCoords);
+        gl_FragColor.a = texColor.a;*/
+        gl_FragColor = texture2D(u_texture, v_texCoords);
 }

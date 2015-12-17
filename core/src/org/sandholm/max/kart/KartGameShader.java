@@ -609,7 +609,6 @@ public class KartGameShader extends BaseShader {
     public void begin (final Camera camera, final RenderContext context) {
         super.begin(camera, context);
 
-        lightsSet = false;
         context.setDepthTest(GL20.GL_LEQUAL);
         context.setCullFace(GL20.GL_BACK);
 
