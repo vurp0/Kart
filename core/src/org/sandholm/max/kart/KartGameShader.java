@@ -235,7 +235,7 @@ public class KartGameShader extends BaseShader {
                 shader.set(inputID, ta.offsetU, ta.offsetV, ta.scaleU, ta.scaleV);
             }
         };
-        public final static Setter specularColor = new LocalSetter() {
+/*        public final static Setter specularColor = new LocalSetter() {
             @Override
             public void set (BaseShader shader, int inputID, Renderable renderable, Attributes combinedAttributes) {
                 shader.set(inputID, ((ColorAttribute)(combinedAttributes.get(ColorAttribute.Specular))).color);
@@ -377,7 +377,7 @@ public class KartGameShader extends BaseShader {
                             .get(CubemapAttribute.EnvironmentMap)).textureDescription));
                 }
             }
-        };
+        };*/
     }
 
     private static String defaultVertexShader = null;
@@ -424,69 +424,7 @@ public class KartGameShader extends BaseShader {
     public final int u_diffuseColor;
     public final int u_diffuseTexture;
     public final int u_diffuseUVTransform;
-/*    public final int u_specularColor;
-    public final int u_specularTexture;
-    public final int u_specularUVTransform;
-    public final int u_emissiveColor;
-    public final int u_emissiveTexture;
-    public final int u_emissiveUVTransform;
-    public final int u_reflectionColor;
-    public final int u_reflectionTexture;
-    public final int u_reflectionUVTransform;
-    public final int u_normalTexture;
-    public final int u_normalUVTransform;
-    public final int u_ambientTexture;
-    public final int u_ambientUVTransform;*/
     public final int u_alphaTest;
-    // Lighting uniforms
-    /*
-    protected final int u_ambientCubemap;
-    protected final int u_environmentCubemap;
-    protected final int u_dirLights0color = register(new Uniform("u_dirLights[0].color"));
-    protected final int u_dirLights0direction = register(new Uniform("u_dirLights[0].direction"));
-    protected final int u_dirLights1color = register(new Uniform("u_dirLights[1].color"));
-    protected final int u_pointLights0color = register(new Uniform("u_pointLights[0].color"));
-    protected final int u_pointLights0position = register(new Uniform("u_pointLights[0].position"));
-    protected final int u_pointLights0intensity = register(new Uniform("u_pointLights[0].intensity"));
-    protected final int u_pointLights1color = register(new Uniform("u_pointLights[1].color"));
-    protected final int u_spotLights0color = register(new Uniform("u_spotLights[0].color"));
-    protected final int u_spotLights0position = register(new Uniform("u_spotLights[0].position"));
-    protected final int u_spotLights0intensity = register(new Uniform("u_spotLights[0].intensity"));
-    protected final int u_spotLights0direction = register(new Uniform("u_spotLights[0].direction"));
-    protected final int u_spotLights0cutoffAngle = register(new Uniform("u_spotLights[0].cutoffAngle"));
-    protected final int u_spotLights0exponent = register(new Uniform("u_spotLights[0].exponent"));
-    protected final int u_spotLights1color = register(new Uniform("u_spotLights[1].color"));
-    protected final int u_fogColor = register(new Uniform("u_fogColor"));
-    protected final int u_shadowMapProjViewTrans = register(new Uniform("u_shadowMapProjViewTrans"));
-    protected final int u_shadowTexture = register(new Uniform("u_shadowTexture"));
-    protected final int u_shadowPCFOffset = register(new Uniform("u_shadowPCFOffset"));
-    // FIXME Cache vertex attribute locations...*/
-
-/*    protected int dirLightsLoc;
-    protected int dirLightsColorOffset;
-    protected int dirLightsDirectionOffset;
-    protected int dirLightsSize;
-    protected int pointLightsLoc;
-    protected int pointLightsColorOffset;
-    protected int pointLightsPositionOffset;
-    protected int pointLightsIntensityOffset;
-    protected int pointLightsSize;
-    protected int spotLightsLoc;
-    protected int spotLightsColorOffset;
-    protected int spotLightsPositionOffset;
-    protected int spotLightsDirectionOffset;
-    protected int spotLightsIntensityOffset;
-    protected int spotLightsCutoffAngleOffset;
-    protected int spotLightsExponentOffset;
-    protected int spotLightsSize;*/
-
-/*    protected final boolean lighting;
-    protected final boolean environmentCubemap;
-    protected final boolean shadowMap;
-    protected final AmbientCubemap ambientCubemap = new AmbientCubemap();
-    protected final DirectionalLight directionalLights[];
-    protected final PointLight pointLights[];
-    protected final SpotLight spotLights[];*/
 
     /** The renderable used to create this shader, invalid after the call to init */
     private Renderable renderable;
@@ -519,24 +457,8 @@ public class KartGameShader extends BaseShader {
         final Attributes attributes = combineAttributes(renderable);
         this.config = config;
         this.program = shaderProgram;
-/*        this.lighting = renderable.environment != null;
-        this.environmentCubemap = attributes.has(CubemapAttribute.EnvironmentMap)
-                || (lighting && attributes.has(CubemapAttribute.EnvironmentMap));
-        this.shadowMap = lighting && renderable.environment.shadowMap != null;*/
         this.renderable = renderable;
         attributesMask = attributes.getMask() | optionalAttributes;
-/*
-        vertexMask = renderable.meshPart.mesh.getVertexAttributes().getMask();
-
-        this.directionalLights = new DirectionalLight[lighting && config.numDirectionalLights > 0 ? config.numDirectionalLights : 0];
-        for (int i = 0; i < directionalLights.length; i++)
-            directionalLights[i] = new DirectionalLight();
-        this.pointLights = new PointLight[lighting && config.numPointLights > 0 ? config.numPointLights : 0];
-        for (int i = 0; i < pointLights.length; i++)
-            pointLights[i] = new PointLight();
-        this.spotLights = new SpotLight[lighting && config.numSpotLights > 0 ? config.numSpotLights : 0];
-        for (int i = 0; i < spotLights.length; i++)
-            spotLights[i] = new SpotLight();*/
 
         if (!config.ignoreUnimplemented && (implementedFlags & attributesMask) != attributesMask)
             throw new GdxRuntimeException("Some attributes not implemented yet (" + attributesMask + ")");
@@ -562,24 +484,8 @@ public class KartGameShader extends BaseShader {
         u_diffuseColor = register(Inputs.diffuseColor, Setters.diffuseColor);
         u_diffuseTexture = register(Inputs.diffuseTexture, Setters.diffuseTexture);
         u_diffuseUVTransform = register(Inputs.diffuseUVTransform, Setters.diffuseUVTransform);
-/*        u_specularColor = register(Inputs.specularColor, Setters.specularColor);
-        u_specularTexture = register(Inputs.specularTexture, Setters.specularTexture);
-        u_specularUVTransform = register(Inputs.specularUVTransform, Setters.specularUVTransform);
-        u_emissiveColor = register(Inputs.emissiveColor, Setters.emissiveColor);
-        u_emissiveTexture = register(Inputs.emissiveTexture, Setters.emissiveTexture);
-        u_emissiveUVTransform = register(Inputs.emissiveUVTransform, Setters.emissiveUVTransform);
-        u_reflectionColor = register(Inputs.reflectionColor, Setters.reflectionColor);
-        u_reflectionTexture = register(Inputs.reflectionTexture, Setters.reflectionTexture);
-        u_reflectionUVTransform = register(Inputs.reflectionUVTransform, Setters.reflectionUVTransform);
-        u_normalTexture = register(Inputs.normalTexture, Setters.normalTexture);
-        u_normalUVTransform = register(Inputs.normalUVTransform, Setters.normalUVTransform);
-        u_ambientTexture = register(Inputs.ambientTexture, Setters.ambientTexture);
-        u_ambientUVTransform = register(Inputs.ambientUVTransform, Setters.ambientUVTransform);*/
         u_alphaTest = register(Inputs.alphaTest);
-/*
-        u_ambientCubemap = lighting ? register(Inputs.ambientCube, new Setters.ACubemap(config.numDirectionalLights,
-                config.numPointLights)) : -1;
-        u_environmentCubemap = environmentCubemap ? register(Inputs.environmentCubemap, Setters.environmentCubemap) : -1;*/
+
     }
 
     @Override
@@ -588,29 +494,6 @@ public class KartGameShader extends BaseShader {
         this.program = null;
         init(program, renderable);
         renderable = null;
-/*
-        dirLightsLoc = loc(u_dirLights0color);
-        dirLightsColorOffset = loc(u_dirLights0color) - dirLightsLoc;
-        dirLightsDirectionOffset = loc(u_dirLights0direction) - dirLightsLoc;
-        dirLightsSize = loc(u_dirLights1color) - dirLightsLoc;
-        if (dirLightsSize < 0) dirLightsSize = 0;
-
-        pointLightsLoc = loc(u_pointLights0color);
-        pointLightsColorOffset = loc(u_pointLights0color) - pointLightsLoc;
-        pointLightsPositionOffset = loc(u_pointLights0position) - pointLightsLoc;
-        pointLightsIntensityOffset = has(u_pointLights0intensity) ? loc(u_pointLights0intensity) - pointLightsLoc : -1;
-        pointLightsSize = loc(u_pointLights1color) - pointLightsLoc;
-        if (pointLightsSize < 0) pointLightsSize = 0;
-
-        spotLightsLoc = loc(u_spotLights0color);
-        spotLightsColorOffset = loc(u_spotLights0color) - spotLightsLoc;
-        spotLightsPositionOffset = loc(u_spotLights0position) - spotLightsLoc;
-        spotLightsDirectionOffset = loc(u_spotLights0direction) - spotLightsLoc;
-        spotLightsIntensityOffset = has(u_spotLights0intensity) ? loc(u_spotLights0intensity) - spotLightsLoc : -1;
-        spotLightsCutoffAngleOffset = loc(u_spotLights0cutoffAngle) - spotLightsLoc;
-        spotLightsExponentOffset = loc(u_spotLights0exponent) - spotLightsLoc;
-        spotLightsSize = loc(u_spotLights1color) - spotLightsLoc;
-        if (spotLightsSize < 0) spotLightsSize = 0;*/
     }
 
     private static final boolean and (final long mask, final long flag) {
@@ -736,12 +619,6 @@ public class KartGameShader extends BaseShader {
     public void begin (final Camera camera, final RenderContext context) {
         super.begin(camera, context);
 
-/*        for (final DirectionalLight dirLight : directionalLights)
-            dirLight.set(0, 0, 0, 0, -1, 0);
-        for (final PointLight pointLight : pointLights)
-            pointLight.set(0, 0, 0, 0, 0, 0, 0);
-        for (final SpotLight spotLight : spotLights)
-            spotLight.set(0, 0, 0, 0, 0, 0, 0, -1, 0, 0, 1, 0);*/
         lightsSet = false;
 
         if (has(u_time)) set(u_time, time += Gdx.graphics.getDeltaTime());
@@ -749,10 +626,10 @@ public class KartGameShader extends BaseShader {
 
     @Override
     public void render (Renderable renderable, Attributes combinedAttributes) {
-        if (!combinedAttributes.has(BlendingAttribute.Type))
+        if (!combinedAttributes.has(BlendingAttribute.Type)) {
             context.setBlending(false, GL20.GL_SRC_ALPHA, GL20.GL_ONE_MINUS_SRC_ALPHA);
+        }
         bindMaterial(combinedAttributes);
-//        if (lighting) bindLights(renderable, combinedAttributes);
         super.render(renderable, combinedAttributes);
     }
 
@@ -773,17 +650,19 @@ public class KartGameShader extends BaseShader {
             if (BlendingAttribute.is(t)) {
                 context.setBlending(true, ((BlendingAttribute)attr).sourceFunction, ((BlendingAttribute)attr).destFunction);
                 set(u_opacity, ((BlendingAttribute)attr).opacity);
-            } else if ((t & IntAttribute.CullFace) == IntAttribute.CullFace)
-                cullFace = ((IntAttribute)attr).value;
-            else if ((t & FloatAttribute.AlphaTest) == FloatAttribute.AlphaTest)
-                set(u_alphaTest, ((FloatAttribute)attr).value);
-            else if ((t & DepthTestAttribute.Type) == DepthTestAttribute.Type) {
+            } else if ((t & IntAttribute.CullFace) == IntAttribute.CullFace) {
+                cullFace = ((IntAttribute) attr).value;
+            } else if ((t & FloatAttribute.AlphaTest) == FloatAttribute.AlphaTest) {
+                set(u_alphaTest, ((FloatAttribute) attr).value);
+            } else if ((t & DepthTestAttribute.Type) == DepthTestAttribute.Type) {
                 DepthTestAttribute dta = (DepthTestAttribute)attr;
                 depthFunc = dta.depthFunc;
                 depthRangeNear = dta.depthRangeNear;
                 depthRangeFar = dta.depthRangeFar;
                 depthMask = dta.depthMask;
-            } else if (!config.ignoreUnimplemented) throw new GdxRuntimeException("Unknown material attribute: " + attr.toString());
+            } else if (!config.ignoreUnimplemented) {
+                throw new GdxRuntimeException("Unknown material attribute: " + attr.toString());
+            }
         }
 
         context.setCullFace(cullFace);

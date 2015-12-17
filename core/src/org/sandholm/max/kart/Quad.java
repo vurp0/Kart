@@ -93,7 +93,7 @@ public class Quad implements Disposable, RenderableProvider {
 
     }
 
-    public void setDecalRotation(Vector3 dir, Vector3 up) {
+    public void setRotation(Vector3 dir, Vector3 up) {
         tmp.set(up).crs(dir).nor();
         tmp2.set(dir).crs(tmp).nor();
         rotation.setFromAxes(tmp.x, tmp2.x, dir.x, tmp.y, tmp2.y, dir.y, tmp.z, tmp2.z, dir.z);
