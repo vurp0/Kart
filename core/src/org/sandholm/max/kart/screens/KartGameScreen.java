@@ -185,6 +185,8 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         camera.viewportWidth = width/(float)height;
         camera.viewportHeight = 1;
 
+        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, true);
+
         postProcShaderProgram.begin();
         postProcShaderProgram.setUniformf("u_resolution", width, height);
         postProcShaderProgram.end();
