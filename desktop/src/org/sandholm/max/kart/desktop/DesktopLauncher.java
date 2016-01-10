@@ -1,10 +1,10 @@
 package org.sandholm.max.kart.desktop;
 
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
-import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
 import com.badlogic.gdx.backends.jglfw.JglfwApplication;
 import com.badlogic.gdx.backends.jglfw.JglfwApplicationConfiguration;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import org.sandholm.max.kart.KartGame;
 
 public class DesktopLauncher {
@@ -20,13 +20,10 @@ public class DesktopLauncher {
 		 * for 32-bit Linux, so on my laptop I have to use LWJGL instead.
 		 */
 
-		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
 		//JglfwApplicationConfiguration config = new JglfwApplicationConfiguration();
-		config.forceExit = false;
-		config.vSyncEnabled = true;
-		config.height = 480;
-		config.width = 800;
-		new LwjglApplication(new KartGame(), config);
+		config.setWindowedMode(800, 480);
+		new Lwjgl3Application(new KartGame(), config);
 		//new JglfwApplication(new KartGame(), config);
 	}
 }
