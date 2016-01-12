@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import org.sandholm.max.kart.KartGame;
+import org.sandholm.max.kart.Menu;
 import org.sandholm.max.kart.UIController;
 
 /**
@@ -12,6 +13,8 @@ import org.sandholm.max.kart.UIController;
 public class MainMenuScreen extends UIScreen implements Screen, UIController {
 
     Texture backgroundTexture;
+
+    Menu mainMenu;
 
     public MainMenuScreen(KartGame game) {
         super(game);
@@ -58,12 +61,12 @@ public class MainMenuScreen extends UIScreen implements Screen, UIController {
     //UIController:
     @Override
     public void upPressed() {
-
+        mainMenu.previousItem();
     }
 
     @Override
     public void downPressed() {
-
+        mainMenu.nextItem();
     }
 
     @Override
@@ -78,7 +81,7 @@ public class MainMenuScreen extends UIScreen implements Screen, UIController {
 
     @Override
     public void OKPressed() {
-        game.transitionTo(KartGame.Flow.GAME_SCREEN);
+        mainMenu.selectItem();
     }
 
     @Override
