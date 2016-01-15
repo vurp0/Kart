@@ -77,8 +77,8 @@ public class TitleScreen extends UIScreen implements Screen, InputProcessor, Con
         Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
 
         UIBatch.begin();
-        UIBatch.draw(backgroundTexture, 0, 0, screenWidth, screenHeight);
-        titleFont.setColor(Color.WHITE);
+        UIBatch.draw(backgroundTexture, 0, 0, screenWidth, screenHeight); //todo: title screen background
+        //titleFont.setColor(Color.WHITE);
         titleLabel.draw(UIBatch, 1);
         subtitleLabel.draw(UIBatch, 1);
         UIBatch.end();
