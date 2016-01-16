@@ -13,5 +13,5 @@ uniform float darkness;
 
 void main()
 {
-  gl_FragColor = v_color * texture2D(u_texture, v_texCoords) * darkness;
+  gl_FragColor = vec4(v_color.rgb * texture2D(u_texture, v_texCoords).rgb * darkness, v_color.a * texture2D(u_texture, v_texCoords).a);
 }

@@ -10,7 +10,6 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
-import com.sun.corba.se.spi.activation.BadServerDefinition;
 import org.sandholm.max.kart.BaseMenuItem;
 import org.sandholm.max.kart.KartGame;
 import org.sandholm.max.kart.Menu;
