@@ -6,7 +6,7 @@ package org.sandholm.max.kart;
 public class BaseMenuItem {
     public Menu.ActionType actionType = Menu.ActionType.OTHER;
 
-    String title;
+    private String title;
 
     public BaseMenuItem(String title) {
         this.title = title;

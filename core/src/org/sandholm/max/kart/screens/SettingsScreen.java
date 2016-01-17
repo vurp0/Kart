@@ -1,6 +1,9 @@
 package org.sandholm.max.kart.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Preferences;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
@@ -8,21 +11,29 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.utils.Align;
-import org.sandholm.max.kart.*;
+import org.sandholm.max.kart.BaseMenuItem;
+import org.sandholm.max.kart.KartGame;
+import org.sandholm.max.kart.Menu;
+import org.sandholm.max.kart.UIController;
 
 import java.util.ArrayList;
 
 /**
  * Created by max on 12.12.2015.
  */
-public class MainMenuScreen extends MenuScreen {
+public class SettingsScreen extends MenuScreen {
 
     Texture backgroundTexture;
 
+    Preferences videoPrefs;
+    boolean fullScreen;
+
     float stateTime;
 
-    public MainMenuScreen(KartGame game) {
+    public SettingsScreen(KartGame game) {
         super(game);
+
+        videoPrefs = Gdx.app.getPreferences("org.sandholm.max.kart.videoprefs");
     }
 
     //Screen:
@@ -30,39 +41,42 @@ public class MainMenuScreen extends MenuScreen {
     public void show() {
         super.show();
 
+        videoPrefs = Gdx.app.getPreferences("org.sandholm.max.kart.videoprefs");
+
+        fullScreen = videoPrefs.getBoolean("fullscreen");
+
         backgroundTexture = new Texture(Gdx.files.internal("background.png")); //TODO: hardcoded placeholder background
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-        menu.menuItems.add(new BaseMenuItem("Item 1"));
-        menu.menuItems.add(new BaseMenuItem("Item 2"));
-        menu.menuItems.add(new BaseMenuItem("Item 3"));
-        menu.menuItems.add(new StartGameMenuItem("Start game"));
-        menu.menuItems.add(new SettingsMenuItem("Settings"));
-        menu.menuItems.add(new BaseMenuItem("Item 5"));
-        menu.menuItems.add(new BaseMenuItem("Item 6"));
+
+        menu.menuItems.add(new ToggleFullscreenMenuItem());
 
         updateMenuLabels();
+
     }
 
-    class StartGameMenuItem extends BaseMenuItem {
-        public StartGameMenuItem(String title) {
-            super(title);
+    class ToggleFullscreenMenuItem extends BaseMenuItem {
+        public ToggleFullscreenMenuItem() {
+            super("Full screen");
         }
 
         @Override
         public void select() {
-            game.transitionTo(KartGame.Flow.GAME_SCREEN);
-        }
-    }
+            videoPrefs.putBoolean("fullscreen", !fullScreen);
+            fullScreen = videoPrefs.getBoolean("fullscreen");
 
-    class SettingsMenuItem extends BaseMenuItem {
-        public SettingsMenuItem(String title) {
-            super(title);
+            if (fullScreen) {
+                Gdx.graphics.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
+            } else {
+                Gdx.graphics.setWindowedMode(800, 480);
+            }
+
+            updateMenuLabels();
         }
 
         @Override
-        public void select() {
-            game.transitionTo(KartGame.Flow.SETTINGS_SCREEN);
+        public String getTitle() {
+            return "Full screen: "+(fullScreen?"yes":"no");
         }
     }
 
@@ -78,6 +92,7 @@ public class MainMenuScreen extends MenuScreen {
                 screenWidth/64+(stateTime%1), screenHeight/64/*-(stateTime%1)*/+(MathUtils.sin(stateTime*4)/7));
 
         drawMenuLabels();
+
         UIBatch.end();
     }
 
@@ -103,7 +118,7 @@ public class MainMenuScreen extends MenuScreen {
 
     @Override
     public void backPressed() {
-
+        game.transitionTo(KartGame.Flow.MAIN_MENU_SCREEN);
     }
 
     @Override
