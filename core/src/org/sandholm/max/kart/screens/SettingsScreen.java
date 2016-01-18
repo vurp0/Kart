@@ -63,6 +63,7 @@ public class SettingsScreen extends MenuScreen {
         @Override
         public void select() {
             videoPrefs.putBoolean("fullscreen", !fullScreen);
+            videoPrefs.flush();
             fullScreen = videoPrefs.getBoolean("fullscreen");
 
             if (fullScreen) {
@@ -70,6 +71,7 @@ public class SettingsScreen extends MenuScreen {
             } else {
                 Gdx.graphics.setWindowedMode(800, 480);
             }
+            resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
 
             updateMenuLabels();
         }

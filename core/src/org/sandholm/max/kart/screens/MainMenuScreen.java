@@ -33,13 +33,9 @@ public class MainMenuScreen extends MenuScreen {
         backgroundTexture = new Texture(Gdx.files.internal("background.png")); //TODO: hardcoded placeholder background
         backgroundTexture.setWrap(Texture.TextureWrap.Repeat, Texture.TextureWrap.Repeat);
 
-        menu.menuItems.add(new BaseMenuItem("Item 1"));
-        menu.menuItems.add(new BaseMenuItem("Item 2"));
-        menu.menuItems.add(new BaseMenuItem("Item 3"));
         menu.menuItems.add(new StartGameMenuItem("Start game"));
         menu.menuItems.add(new SettingsMenuItem("Settings"));
-        menu.menuItems.add(new BaseMenuItem("Item 5"));
-        menu.menuItems.add(new BaseMenuItem("Item 6"));
+        menu.menuItems.add(new QuitMenuItem("Quit game"));
 
         updateMenuLabels();
     }
@@ -63,6 +59,17 @@ public class MainMenuScreen extends MenuScreen {
         @Override
         public void select() {
             game.transitionTo(KartGame.Flow.SETTINGS_SCREEN);
+        }
+    }
+
+    class QuitMenuItem extends BaseMenuItem {
+        public QuitMenuItem(String title) {
+            super(title);
+        }
+
+        @Override
+        public void select() {
+            Gdx.app.exit();
         }
     }
 
