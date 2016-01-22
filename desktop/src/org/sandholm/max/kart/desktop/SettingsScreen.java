@@ -1,4 +1,4 @@
-package org.sandholm.max.kart.screens;
+package org.sandholm.max.kart.desktop;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Preferences;
@@ -15,6 +15,7 @@ import org.sandholm.max.kart.BaseMenuItem;
 import org.sandholm.max.kart.KartGame;
 import org.sandholm.max.kart.Menu;
 import org.sandholm.max.kart.UIController;
+import org.sandholm.max.kart.screens.MenuScreen;
 
 import java.util.ArrayList;
 
@@ -65,6 +66,8 @@ public class SettingsScreen extends MenuScreen {
             videoPrefs.putBoolean("fullscreen", !fullScreen);
             videoPrefs.flush();
             fullScreen = videoPrefs.getBoolean("fullscreen");
+
+            updateMenuLabels();
 
             if (fullScreen) {
                 Gdx.graphics.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());

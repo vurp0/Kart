@@ -12,6 +12,8 @@ public class DesktopLauncher {
 		config.setWindowedMode(800, 480);
 		config.setResizable(false);
 
-		new Lwjgl3Application(new KartGame(), config);
+		DesktopSpecifics desktopSpecifics = new DesktopSpecifics();
+
+		new Lwjgl3Application(new KartGame(desktopSpecifics), config);
 	}
 }

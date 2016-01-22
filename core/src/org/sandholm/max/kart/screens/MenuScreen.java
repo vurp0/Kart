@@ -19,7 +19,7 @@ import java.util.ArrayList;
  */
 abstract public class MenuScreen extends UIScreen implements Screen, UIController {
 
-    Menu menu;
+    protected Menu menu;
 
     private ArrayList<Group> menuLabels;
 
@@ -68,6 +68,7 @@ abstract public class MenuScreen extends UIScreen implements Screen, UIControlle
         for (int i=0; i<menuLabels.size(); i++){
             ((Label)menuLabels.get(i).getChildren().get(0)).setText(menu.menuItems.get(i).getTitle());
             ((Label)menuLabels.get(i).getChildren().get(0)).setStyle(new Label.LabelStyle(menuFont, Color.WHITE));
+            ((Label)menuLabels.get(i).getChildren().get(0)).setAlignment(Align.center);
         }
         for (int i=menuLabels.size(); i<menu.menuItems.size(); i++) {
             Label tmpTitleLabel = new Label(menu.menuItems.get(i).getTitle(), new Label.LabelStyle(menuFont, Color.WHITE));
