@@ -4,6 +4,8 @@ import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.controllers.Controllers;
+import com.badlogic.gdx.graphics.Cursor;
+import com.badlogic.gdx.graphics.Pixmap;
 import org.sandholm.max.kart.gamecontroller.GameController;
 import org.sandholm.max.kart.screens.*;
 import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
@@ -43,6 +45,8 @@ public class KartGame extends Game {
         } else {
             Gdx.graphics.setWindowedMode(800, 480);
         }
+
+        Gdx.graphics.setCursor(Gdx.graphics.newCursor(new Pixmap(1, 1, Pixmap.Format.RGBA8888), 0, 0));
 
         tweenManager = new TweenManager();
         Tween.setCombinedAttributesLimit(1);
