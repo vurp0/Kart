@@ -25,6 +25,12 @@ public class Kart {
         this.friction = friction;
     }
 
+    public String getName() {
+        return name;
+    }
+
+    String name;
+
     float turningSpeed;
     float driftingSpeed;
     float engineForce;
@@ -49,14 +55,15 @@ public class Kart {
     public Kart(String kartName, Vector2 position, float rotation, World world) {
         try {
             JSONParser parser = new JSONParser();
-            Map obj = (Map)parser.parse(Gdx.files.internal("karts/"+kartName+".json").reader());
+            Map obj = (Map)parser.parse(Gdx.files.internal("karts/"+kartName+"/kart.json").reader());
+            name = ((String)obj.get("name"));
             turningSpeed = ((Number)obj.get("turningSpeed")).floatValue();
             driftingSpeed = ((Number)obj.get("driftingSpeed")).floatValue();
             engineForce = ((Number)obj.get("engineForce")).floatValue();
             width = ((Number)obj.get("width")).floatValue();
             length = ((Number)obj.get("length")).floatValue();
             density = ((Number)obj.get("density")).floatValue();
-            spriteSheet = new Texture("karts/"+obj.get("sprites"));
+            spriteSheet = new Texture("karts/"+kartName+"/sprites.png");
             kartSprites = new TextureRegion[22];
             for (int i=0; i<=11; i++){  //make TextureRegions from the normal sprites
                 kartSprites[i] = new TextureRegion(spriteSheet, i*32, 0, 32, 32);
@@ -71,24 +78,25 @@ public class Kart {
 
         this.position = position;
         this.rotation = rotation;
-
-        BodyDef bodyDef = new BodyDef();
-        bodyDef.type = BodyDef.BodyType.DynamicBody;
-        bodyDef.position.set(this.position);
-        bodyDef.angle = rotation*MathUtils.degreesToRadians;
-        bodyDef.fixedRotation = true;
-        pBody = world.createBody(bodyDef);
-        PolygonShape shape = new PolygonShape();
-        shape.setAsBox(length, width);
-        FixtureDef fixtureDef = new FixtureDef();
-        fixtureDef.shape = shape;
-        fixtureDef.density = density;
-        fixtureDef.restitution = 1f;
-        setFriction(FRICTION_S);
-        pBody.setLinearDamping(friction);
-        pBody.createFixture(fixtureDef);
-        pBody.setUserData(this);
-        shape.dispose();
+        if (world != null) {
+            BodyDef bodyDef = new BodyDef();
+            bodyDef.type = BodyDef.BodyType.DynamicBody;
+            bodyDef.position.set(this.position);
+            bodyDef.angle = rotation * MathUtils.degreesToRadians;
+            bodyDef.fixedRotation = true;
+            pBody = world.createBody(bodyDef);
+            PolygonShape shape = new PolygonShape();
+            shape.setAsBox(length, width);
+            FixtureDef fixtureDef = new FixtureDef();
+            fixtureDef.shape = shape;
+            fixtureDef.density = density;
+            fixtureDef.restitution = 1f;
+            setFriction(FRICTION_S);
+            pBody.setLinearDamping(friction);
+            pBody.createFixture(fixtureDef);
+            pBody.setUserData(this);
+            shape.dispose();
+        }
 
         currentContacts = 0;
     }

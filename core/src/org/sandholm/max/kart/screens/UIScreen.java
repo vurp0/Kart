@@ -73,7 +73,7 @@ abstract public class UIScreen {
         UIShader.end();
         if (!fadeInStarted && deltaTime < 1f/30f) {
             fadeInStarted = true;
-            Tween.to(this, UIScreenAccessor.FULL_SCREEN_DARKNESS, 1.5f).target(1f).ease(TweenEquations.easeOutQuart).start(game.tweenManager).setCallback(new FadeInTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
+            Tween.to(this, UIScreenAccessor.FULL_SCREEN_DARKNESS, 1f).target(1f).ease(TweenEquations.easeOutQuart).start(game.tweenManager).setCallback(new FadeInTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
         }
         game.tweenManager.update(deltaTime);
     }

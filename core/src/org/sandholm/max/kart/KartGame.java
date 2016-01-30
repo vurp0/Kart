@@ -14,9 +14,11 @@ import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
  * Created by max on 23.9.2015.
  */
 public class KartGame extends Game {
+    static float FADE_TIME = 1.5f;
+
     PlatformSpecifics platformSpecifics;
 
-    public enum Flow{TITLE_SCREEN,MAIN_MENU_SCREEN,SETTINGS_SCREEN,KART_MAP_SELECT_SCREEN,GAME_SCREEN,RESULTS_SCREEN};
+    public enum Flow{TITLE_SCREEN,MAIN_MENU_SCREEN,SETTINGS_SCREEN,KART_SELECT_SCREEN,MAP_SELECT_SCREEN,GAME_SCREEN,RESULTS_SCREEN};
 
     public InputMultiplexer multiplexer;
 
@@ -77,20 +79,25 @@ public class KartGame extends Game {
                 break;
             case MAIN_MENU_SCREEN:
                 MainMenuScreen mainMenuScreen = new MainMenuScreen(this);
-                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, 2f).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(mainMenuScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADE_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(mainMenuScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
                 kartGameController.setUIController(mainMenuScreen);
                 break;
             case SETTINGS_SCREEN:
                 MenuScreen settingsScreen = platformSpecifics.newSettingsScreen(this);
-                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, 2f).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(settingsScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADE_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(settingsScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
                 kartGameController.setUIController(settingsScreen);
                 break;
-            case KART_MAP_SELECT_SCREEN:
+            case KART_SELECT_SCREEN:
+                MenuScreen kartSelectScreen = new KartSelectScreen(this);
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADE_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(kartSelectScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
+                kartGameController.setUIController(kartSelectScreen);
+                break;
+            case MAP_SELECT_SCREEN:
                 System.out.println("TODO: switch to kart&map select screen"); //TODO
                 break;
             case GAME_SCREEN:
                 kartGameScreen = new KartGameScreen(this);
-                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, 2f).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(kartGameScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADE_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(kartGameScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
                 //((UIScreen) getScreen()).startFadeOut();
                 kartGameController.setUIController(kartGameScreen);
                 break;
@@ -117,8 +124,8 @@ public class KartGame extends Game {
         }
     }
 
-    /*public void startGame() {
-        kartGameScreen = new KartGameScreen(this);
-        setScreen(kartGameScreen);
-    }*/
+    public void quitGame() {
+        platformSpecifics.quitGame();
+        Gdx.app.exit();
+    }
 }

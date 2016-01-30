@@ -21,11 +21,11 @@ abstract public class MenuScreen extends UIScreen implements Screen, UIControlle
 
     protected Menu menu;
 
-    private ArrayList<Group> menuLabels;
+    protected ArrayList<Group> menuLabels;
 
     private BitmapFont menuFont;
 
-    private float menuDrawingOffset;
+    protected float menuDrawingOffset;
 
     public MenuScreen(KartGame game) {
         super(game);
@@ -48,7 +48,7 @@ abstract public class MenuScreen extends UIScreen implements Screen, UIControlle
 
         super.render(deltaTime);
 
-        menuDrawingOffset = MathUtils.lerp(menuDrawingOffset, screenHeight / 2 - menu.getMenuIndex() * screenHeight / 7, 0.1f);
+        //menuDrawingOffset = MathUtils.lerp(menuDrawingOffset, screenHeight / 2 - menu.getMenuIndex() * screenHeight / 7, 0.1f);
     }
 
     public void drawMenuLabels() {

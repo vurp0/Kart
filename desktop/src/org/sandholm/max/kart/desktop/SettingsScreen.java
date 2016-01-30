@@ -72,7 +72,6 @@ public class SettingsScreen extends MenuScreen {
             updateMenuLabels();
 
             if (fullScreen) {
-                //Gdx.graphics.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
                 Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode(Gdx.graphics.getMonitor()));
             } else {
                 Gdx.graphics.setWindowedMode(800, 480);
@@ -94,6 +93,8 @@ public class SettingsScreen extends MenuScreen {
         stateTime += deltaTime;
 
         super.render(deltaTime);
+
+        menuDrawingOffset = MathUtils.lerp(menuDrawingOffset, screenHeight / 2 - menu.getMenuIndex() * screenHeight / 7, 0.1f);
 
         UIBatch.begin();
         UIBatch.draw(backgroundTexture, 0, 0, screenWidth, screenHeight,

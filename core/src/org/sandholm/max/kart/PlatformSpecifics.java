@@ -8,4 +8,6 @@ import org.sandholm.max.kart.screens.MenuScreen;
 public interface PlatformSpecifics {
 
     public MenuScreen newSettingsScreen(KartGame game);
+
+    public void quitGame();
 }

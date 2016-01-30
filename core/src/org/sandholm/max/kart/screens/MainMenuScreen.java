@@ -47,7 +47,7 @@ public class MainMenuScreen extends MenuScreen {
 
         @Override
         public void select() {
-            game.transitionTo(KartGame.Flow.GAME_SCREEN);
+            game.transitionTo(KartGame.Flow.KART_SELECT_SCREEN);
         }
     }
 
@@ -69,7 +69,7 @@ public class MainMenuScreen extends MenuScreen {
 
         @Override
         public void select() {
-            Gdx.app.exit();
+            game.quitGame();
         }
     }
 
@@ -78,6 +78,8 @@ public class MainMenuScreen extends MenuScreen {
         stateTime += deltaTime;
 
         super.render(deltaTime);
+
+        menuDrawingOffset = MathUtils.lerp(menuDrawingOffset, screenHeight / 2 - menu.getMenuIndex() * screenHeight / 7, 0.1f);
 
         UIBatch.begin();
         UIBatch.draw(backgroundTexture, 0, 0, screenWidth, screenHeight,

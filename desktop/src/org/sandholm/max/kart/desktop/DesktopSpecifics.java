@@ -1,5 +1,6 @@
 package org.sandholm.max.kart.desktop;
 
+import com.badlogic.gdx.Gdx;
 import org.sandholm.max.kart.KartGame;
 import org.sandholm.max.kart.PlatformSpecifics;
 import org.sandholm.max.kart.screens.MenuScreen;
@@ -15,4 +16,11 @@ public class DesktopSpecifics implements PlatformSpecifics {
         settingsScreen = new SettingsScreen(game);
         return settingsScreen;
     }
+
+    @Override
+    public void quitGame() {
+        Gdx.graphics.setWindowedMode(800, 480);
+    }
+
+
 }
