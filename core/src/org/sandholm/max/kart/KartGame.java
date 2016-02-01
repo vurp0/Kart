@@ -4,7 +4,6 @@ import aurelienribon.tweenengine.*;
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.badlogic.gdx.controllers.Controllers;
-import com.badlogic.gdx.graphics.Cursor;
 import com.badlogic.gdx.graphics.Pixmap;
 import org.sandholm.max.kart.gamecontroller.GameController;
 import org.sandholm.max.kart.screens.*;
@@ -14,11 +13,11 @@ import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
  * Created by max on 23.9.2015.
  */
 public class KartGame extends Game {
-    static float FADE_TIME = 1.5f;
+    static float FADEOUT_TIME = 1f;
 
     PlatformSpecifics platformSpecifics;
 
-    public enum Flow{TITLE_SCREEN,MAIN_MENU_SCREEN,SETTINGS_SCREEN,KART_SELECT_SCREEN,MAP_SELECT_SCREEN,GAME_SCREEN,RESULTS_SCREEN};
+    public enum Flow{TITLE_SCREEN,MAIN_MENU_SCREEN,SETTINGS_SCREEN,CONTROLLER_MAPPING_SCREEN,KART_SELECT_SCREEN,MAP_SELECT_SCREEN,GAME_SCREEN,RESULTS_SCREEN};
 
     public InputMultiplexer multiplexer;
 
@@ -79,17 +78,22 @@ public class KartGame extends Game {
                 break;
             case MAIN_MENU_SCREEN:
                 MainMenuScreen mainMenuScreen = new MainMenuScreen(this);
-                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADE_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(mainMenuScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADEOUT_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(mainMenuScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
                 kartGameController.setUIController(mainMenuScreen);
                 break;
             case SETTINGS_SCREEN:
                 MenuScreen settingsScreen = platformSpecifics.newSettingsScreen(this);
-                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADE_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(settingsScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADEOUT_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(settingsScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
                 kartGameController.setUIController(settingsScreen);
+                break;
+            case CONTROLLER_MAPPING_SCREEN:
+                ControllerMappingScreen controllerMappingScreen = new ControllerMappingScreen(this);
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADEOUT_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(controllerMappingScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
+                kartGameController.setUIController(controllerMappingScreen);
                 break;
             case KART_SELECT_SCREEN:
                 MenuScreen kartSelectScreen = new KartSelectScreen(this);
-                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADE_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(kartSelectScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADEOUT_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(kartSelectScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
                 kartGameController.setUIController(kartSelectScreen);
                 break;
             case MAP_SELECT_SCREEN:
@@ -97,8 +101,7 @@ public class KartGame extends Game {
                 break;
             case GAME_SCREEN:
                 kartGameScreen = new KartGameScreen(this);
-                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADE_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(kartGameScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
-                //((UIScreen) getScreen()).startFadeOut();
+                Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADEOUT_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(kartGameScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
                 kartGameController.setUIController(kartGameScreen);
                 break;
             case RESULTS_SCREEN:

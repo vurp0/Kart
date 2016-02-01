@@ -37,6 +37,7 @@ public class KartSelectScreen extends MenuScreen {
             JSONParser parser = new JSONParser();
             JSONArray obj = (JSONArray)parser.parse(Gdx.files.internal("karts/karts.json").reader());
             for (Object name : obj) {
+
                 Kart tmpKart = new Kart((String)name, Vector2.Zero, 0, null);
                 menu.menuItems.add(new KartMenuItem(tmpKart));
             }
