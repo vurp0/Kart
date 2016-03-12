@@ -31,6 +31,9 @@ public class Kart {
 
     String name;
 
+    public String getFileName() { return fileName; }
+    String fileName;
+
     float turningSpeed;
     float driftingSpeed;
     float engineForce;
@@ -53,6 +56,7 @@ public class Kart {
     float rotation;
 
     public Kart(String kartName, Vector2 position, float rotation, World world) {
+        fileName = kartName;
         try {
             JSONParser parser = new JSONParser();
             Map obj = (Map)parser.parse(Gdx.files.internal("karts/"+kartName+"/kart.json").reader());

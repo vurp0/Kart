@@ -2,7 +2,6 @@ package org.sandholm.max.kart.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import org.json.simple.JSONArray;
@@ -10,9 +9,6 @@ import org.json.simple.parser.JSONParser;
 import org.sandholm.max.kart.BaseMenuItem;
 import org.sandholm.max.kart.Kart;
 import org.sandholm.max.kart.KartGame;
-
-import java.util.ArrayList;
-import java.util.Map;
 
 /**
  * Created by max on 2016-01-30.
@@ -108,6 +104,8 @@ public class KartSelectScreen extends MenuScreen {
 
         @Override
         public void select() {
+            game.playerKartFileName = this.kart.getFileName();
+            game.transitionTo(KartGame.Flow.GAME_SCREEN);
             return;
         }
     }

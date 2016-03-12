@@ -24,6 +24,8 @@ public class KartGame extends Game {
     KartGameScreen kartGameScreen;
     public GameController kartGameController;
 
+    public String playerKartFileName;
+
     TitleScreen titleScreen;
 
     public TweenManager tweenManager;
@@ -100,7 +102,7 @@ public class KartGame extends Game {
                 System.out.println("TODO: switch to kart&map select screen"); //TODO
                 break;
             case GAME_SCREEN:
-                kartGameScreen = new KartGameScreen(this);
+                kartGameScreen = new KartGameScreen(this, playerKartFileName);
                 Tween.to(getScreen(), UIScreenAccessor.FULL_SCREEN_DARKNESS, FADEOUT_TIME).target(0f).ease(TweenEquations.easeOutQuart).start(tweenManager).setCallback(new SwitchScreenCallback(kartGameScreen)).setCallbackTriggers(TweenCallback.COMPLETE);
                 kartGameController.setUIController(kartGameScreen);
                 break;

@@ -8,13 +8,11 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.g3d.*;
 import com.badlogic.gdx.graphics.glutils.FrameBuffer;
-import com.badlogic.gdx.graphics.g3d.decals.CameraGroupStrategy;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.Timer;
 import org.sandholm.max.kart.*;
 import org.sandholm.max.kart.gamecontroller.DumbAIGameController;
 import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
@@ -27,13 +25,13 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     World gameWorld;
 
+    String playerKartFileName;
+
     float runningStateTime = 0f;
     GameState gameState = GameState.STARTING;
 
     static float CAMERA_HEIGHT = 4f;
 
-    //CameraGroupStrategy groupStrategy;
-    //DecalBatch decalBatch;
     ModelBatch quadBatch;
 
     Quad groundQuad;
@@ -87,8 +85,9 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     BitmapFont UIFont;
 
-    public KartGameScreen(KartGame game) {
+    public KartGameScreen(KartGame game, String playerKartFileName) {
         super(game);
+        this.playerKartFileName = playerKartFileName;
     }
 
     @Override
@@ -141,7 +140,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
         otherKartController = new DumbAIGameController();
 
-        Kart playerKart = new Kart("mario", gameMap.getSpawnPoint().cpy(), gameMap.getSpawnRotation(), gameWorld);
+        Kart playerKart = new Kart(playerKartFileName, gameMap.getSpawnPoint().cpy(), gameMap.getSpawnRotation(), gameWorld);
         playerKart.setController(game.kartGameController);
         cameraFollowKart = playerKart;
 
