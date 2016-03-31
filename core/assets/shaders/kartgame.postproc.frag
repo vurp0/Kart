@@ -22,8 +22,9 @@ varying MED vec2 v_texCoord0;
 
 void main(){
     vec4 texColor = texture2D(u_texture, v_texCoord0);
+    gl_FragColor = texColor;
 
-    vec2 position = (gl_FragCoord.xy / u_resolution.xy) - vec2(0.5);
+    /*vec2 position = (gl_FragCoord.xy / u_resolution.xy) - vec2(0.5);
     float len = length(position);
 
     float vignette = smoothstep(VIGNETTE_OUTER_RADIUS, VIGNETTE_INNER_RADIUS, len);
@@ -39,5 +40,5 @@ void main(){
     tmpColor += BRIGHTNESS;
 
     gl_FragColor.rgb = tmpColor.rgb * fadeDark;
-    gl_FragColor.a = 1.0;
+    gl_FragColor.a = 1.0;*/
 }

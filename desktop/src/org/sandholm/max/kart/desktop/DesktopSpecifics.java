@@ -11,8 +11,8 @@ import org.sandholm.max.kart.screens.MenuScreen;
 public class DesktopSpecifics implements PlatformSpecifics {
     private SettingsScreen settingsScreen;
 
-    static int WINDOW_WIDTH = 256;
-    static int WINDOW_HEIGHT = 256;
+    static int WINDOW_WIDTH = 640;
+    static int WINDOW_HEIGHT = 576;
 
     @Override
     public int getWindowWidth() {

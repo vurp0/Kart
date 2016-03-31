@@ -19,37 +19,36 @@ import org.sandholm.max.kart.tweenaccessors.MenuScreenAccessor;
 import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
 
 import java.util.ArrayList;
+import java.util.stream.Collectors;
 
 public class KartGameScreen extends MenuScreen implements Screen, ContactListener, UIController {
 
-    enum GameState{RUNNING,PAUSING,PAUSED,UNPAUSING,STARTING}
+    private enum GameState{RUNNING,PAUSING,PAUSED,UNPAUSING,STARTING}
 
-    World gameWorld;
+    private World gameWorld;
 
-    String playerKartFileName;
+    private String playerKartFileName;
 
-    float runningStateTime = 0f;
-    GameState gameState = GameState.STARTING;
+    private float runningStateTime = 0f;
+    private GameState gameState = GameState.STARTING;
 
-    static float CAMERA_HEIGHT = 4f;
+    private static float CAMERA_HEIGHT = 4f;
 
-    ModelBatch quadBatch;
+    private ModelBatch quadBatch;
 
-    Quad groundQuad;
-    ArrayList<Quad> kartQuads;
+    private Quad groundQuad;
+    private ArrayList<Quad> kartQuads;
 
-    SpriteBatch skyBatch;
+    private SpriteBatch skyBatch;
 
     //Texture groundTexture;
-    PerspectiveCamera camera;
-    ShaderProgram skyBatchShaderProgram;
-    Shader quadShader;
+    private PerspectiveCamera camera;
 
-    ShaderProgram postProcShaderProgram;
-    FrameBuffer frameBuffer1;
-    Mesh fullScreenMesh = createFullScreenQuad();
+    private ShaderProgram postProcShaderProgram;
+    private FrameBuffer frameBuffer1;
+    private Mesh fullScreenMesh = createFullScreenQuad();
 
-    float gameSceneDarkness = 0f;
+    private float gameSceneDarkness = 0f;
 
     @Override
     public float getFullScreenDarkness() {
@@ -69,22 +68,20 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
         this.gameSceneDarkness = darkness;
     }
 
-    float cameraFOV = 45f;
-    float FOVIntensifier = 0f;
+    private float cameraFOV = 45f;
 
-    Shake shake;
+    private Shake shake;
 
-    GameMap gameMap;
+    private GameMap gameMap;
 
-    float cameraAngle;
-    float cameraVerticalAngle;
+    private float cameraAngle;
+    private float cameraVerticalAngle;
 
 
-    Kart cameraFollowKart;
-    ArrayList<Kart> karts;
-    DumbAIGameController otherKartController;
+    private Kart cameraFollowKart;
+    private ArrayList<Kart> karts;
 
-    BitmapFont UIFont;
+    private BitmapFont UIFont;
 
     public KartGameScreen(KartGame game, String playerKartFileName) {
         super(game);
@@ -110,7 +107,7 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
         String skyBatchVertexShader = Gdx.files.internal("shaders/kartgame.vert").readString();
         String skyBatchFragmentShader = Gdx.files.internal("shaders/kartgame.frag").readString();
-        skyBatchShaderProgram = new ShaderProgram(skyBatchVertexShader, skyBatchFragmentShader);
+        ShaderProgram skyBatchShaderProgram = new ShaderProgram(skyBatchVertexShader, skyBatchFragmentShader);
         if (!skyBatchShaderProgram.isCompiled()) throw new IllegalArgumentException("couldn't compile shader: " + skyBatchShaderProgram.getLog());
 
         String postProcVertexShader = Gdx.files.internal("shaders/kartgame.postproc.vert").readString();
@@ -123,7 +120,7 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
         UIDarkness = 0f;
 
-        gameMap = new GameMap("testlevel");
+        gameMap = new GameMap("lowrestest");
         gameWorld = new World(Vector2.Zero, true);
 
         Body worldBody = gameMap.createBody(gameWorld);
@@ -141,7 +138,7 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
         karts = new ArrayList<>();
         kartQuads = new ArrayList<>();
 
-        otherKartController = new DumbAIGameController();
+        DumbAIGameController otherKartController = new DumbAIGameController();
 
         Kart playerKart = new Kart(playerKartFileName, gameMap.getSpawnPoint().cpy(), gameMap.getSpawnRotation(), gameWorld);
         playerKart.setController(game.kartGameController);
@@ -161,9 +158,7 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
             karts.add(tempKart);
         }
 
-        for (Kart k : karts) {
-            kartQuads.add(new Quad(k.getTextureRegionFromAngle(k.getRotation()), 1.28f, 1.28f));
-        }
+        kartQuads.addAll(karts.stream().map(k -> new Quad(k.getTextureRegionFromAngle(k.getRotation()), 1.28f, 1.28f)).collect(Collectors.toList()));
 
         UIFont = generateFont(0.08f);
         shake = new Shake();
@@ -192,11 +187,11 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
         camera.viewportHeight = 1;
 
         //frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, true);
-        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, 64, 64, true);
+        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, 160, 144, true);
 
-        postProcShaderProgram.begin();
-        postProcShaderProgram.setUniformf("u_resolution", 64, 64);
-        postProcShaderProgram.end();
+        //postProcShaderProgram.begin();
+        //postProcShaderProgram.setUniformf("u_resolution", screenWidth, screenHeight);
+        //postProcShaderProgram.end();
     }
 
     //TODO: this method could still be useful some day, and I should probably put it somewhere as a generic utility method
@@ -212,21 +207,21 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
                 gameRender(deltaTime);
                 break;
             case PAUSING:
-                pausingRender(deltaTime);
+                pausingRender();
                 break;
             case PAUSED:
-                pausedRender(deltaTime);
+                pausedRender();
                 break;
             case UNPAUSING:
-                unpausingRender(deltaTime);
+                unpausingRender();
                 break;
             case STARTING:
-                startingRender(deltaTime);
+                startingRender();
                 break;
         }
     }
 
-    public void gameRender(float deltaTime) {
+    private void gameRender(float deltaTime) {
 
         runningStateTime += deltaTime;
 
@@ -243,12 +238,12 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
 
 
-    public void pausingRender(float deltaTime) {
+    private void pausingRender() {
         drawKartSceneWithPostProc();
         drawPauseMenu();
 
     }
-    class PausingTweenCallback implements TweenCallback {
+    private class PausingTweenCallback implements TweenCallback {
         @Override
         public void onEvent(int eventType, BaseTween<?> source) {
             switch (eventType) {
@@ -258,17 +253,17 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
         }
     }
 
-    public void pausedRender(float deltaTime) {
+    private void pausedRender() {
         drawKartSceneWithPostProc();
         drawPauseMenu();
 
     }
 
-    public void unpausingRender(float deltaTime) {
+    private void unpausingRender() {
         drawKartSceneWithPostProc();
         drawPauseMenu();
     }
-    class UnpausingTweenCallback implements TweenCallback {
+    private class UnpausingTweenCallback implements TweenCallback {
         @Override
         public void onEvent(int eventType, BaseTween<?> source) {
             switch (eventType) {
@@ -278,11 +273,11 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
         }
     }
 
-    public void startingRender(float deltaTime) {
+    private void startingRender() {
         drawKartSceneWithPostProc();
     }
 
-    public void drawPauseMenu() {
+    private void drawPauseMenu() {
 
         UIBatch.begin();
 
@@ -295,8 +290,8 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
         gameState = GameState.RUNNING;
     }
 
-    public void updateCamera(float deltaTime) {
-        FOVIntensifier = cameraFollowKart.getBody().getLinearVelocity().len()*0.9f;
+    private void updateCamera(float deltaTime) {
+        float FOVIntensifier = 0;//cameraFollowKart.getBody().getLinearVelocity().len() * 0.9f;
         cameraAngle = MathUtils.radiansToDegrees * MathUtils.lerpAngle(MathUtils.degreesToRadians * cameraAngle, MathUtils.degreesToRadians * cameraFollowKart.getRotation(), 0.06f);
         camera.fieldOfView = MathUtils.lerp(camera.fieldOfView, cameraFOV + FOVIntensifier, 0.1f);
         cameraVerticalAngle = 10;
@@ -310,7 +305,7 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
     }
 
-    public void drawKartSceneWithPostProc() {
+    private void drawKartSceneWithPostProc() {
         frameBuffer1.begin();
             Gdx.gl.glCullFace(GL20.GL_BACK);
             Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
@@ -320,9 +315,9 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
             drawKartScene();
         frameBuffer1.end();
 
-        postProcShaderProgram.begin();
-        postProcShaderProgram.setUniformf("fadeDark", getBackgroundDarkness());
-        postProcShaderProgram.end();
+        //postProcShaderProgram.begin();
+        //postProcShaderProgram.setUniformf("fadeDark", getBackgroundDarkness());
+        //postProcShaderProgram.end();
 
         frameBuffer1.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         frameBuffer1.getColorBufferTexture().bind();
@@ -330,12 +325,13 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
             postProcShaderProgram.begin();
                 fullScreenMesh.render(postProcShaderProgram, GL20.GL_TRIANGLES);
+
             postProcShaderProgram.end();
 
         drawUI();
     }
 
-    public static Mesh createFullScreenQuad(){
+    private static Mesh createFullScreenQuad(){
         float[] verts = new float[] {
             -1f,-1f,  0f, 0f,
              1f,-1f,  1f, 0f,
@@ -352,7 +348,7 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
         return tmpMesh;
     }
 
-    public void drawKartScene() {
+    private void drawKartScene() {
 
         Gdx.gl.glClearColor(0f, 0f, 0f, 1f);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
@@ -383,7 +379,7 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
     }
 
-    public void drawUI() {
+    private void drawUI() {
         UIBatch.begin();
         drawText(UIFont, UIBatch, String.valueOf(Gdx.graphics.getFramesPerSecond())+" fps", screenWidth, 0, Anchor.SE);
         UIBatch.end();
