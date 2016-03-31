@@ -6,8 +6,10 @@ import org.sandholm.max.kart.screens.MenuScreen;
  * Created by max on 2016-01-22.
  */
 public interface PlatformSpecifics {
+    int getWindowWidth();
+    int getWindowHeight();
 
-    public MenuScreen newSettingsScreen(KartGame game);
+    MenuScreen newSettingsScreen(KartGame game);
 
-    public void quitGame();
+    void quitGame();
 }

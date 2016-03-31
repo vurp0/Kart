@@ -7,6 +7,7 @@ import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Pixmap;
 import org.sandholm.max.kart.gamecontroller.GameController;
 import org.sandholm.max.kart.screens.*;
+import org.sandholm.max.kart.tweenaccessors.MenuScreenAccessor;
 import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
 
 /**
@@ -15,7 +16,7 @@ import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
 public class KartGame extends Game {
     static float FADEOUT_TIME = 1f;
 
-    PlatformSpecifics platformSpecifics;
+    public PlatformSpecifics platformSpecifics;
 
     public enum Flow{TITLE_SCREEN,MAIN_MENU_SCREEN,SETTINGS_SCREEN,CONTROLLER_MAPPING_SCREEN,KART_SELECT_SCREEN,MAP_SELECT_SCREEN,GAME_SCREEN,RESULTS_SCREEN};
 
@@ -46,14 +47,16 @@ public class KartGame extends Game {
         if (fullScreen) {
             Gdx.graphics.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
         } else {
-            Gdx.graphics.setWindowedMode(800, 480);
+            Gdx.graphics.setWindowedMode(platformSpecifics.getWindowWidth(), platformSpecifics.getWindowHeight());
         }
 
         Gdx.graphics.setCursor(Gdx.graphics.newCursor(new Pixmap(1, 1, Pixmap.Format.RGBA8888), 0, 0));
 
         tweenManager = new TweenManager();
-        Tween.setCombinedAttributesLimit(1);
+        Tween.setCombinedAttributesLimit(4);
         Tween.registerAccessor(UIScreen.class, new UIScreenAccessor());
+        Tween.registerAccessor(MenuScreen.class, new MenuScreenAccessor());
+        Tween.registerAccessor(MenuScreen.class, new UIScreenAccessor());
 
         multiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(multiplexer);

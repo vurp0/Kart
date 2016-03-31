@@ -25,6 +25,14 @@ abstract public class MenuScreen extends UIScreen implements Screen, UIControlle
 
     private BitmapFont menuFont;
 
+    public float getMenuDrawingOffset() {
+        return menuDrawingOffset;
+    }
+
+    public void setMenuDrawingOffset(float menuDrawingOffset) {
+        this.menuDrawingOffset = menuDrawingOffset;
+    }
+
     protected float menuDrawingOffset;
 
     public MenuScreen(KartGame game) {

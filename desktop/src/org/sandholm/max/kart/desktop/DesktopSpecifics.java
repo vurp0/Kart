@@ -11,6 +11,19 @@ import org.sandholm.max.kart.screens.MenuScreen;
 public class DesktopSpecifics implements PlatformSpecifics {
     private SettingsScreen settingsScreen;
 
+    static int WINDOW_WIDTH = 256;
+    static int WINDOW_HEIGHT = 256;
+
+    @Override
+    public int getWindowWidth() {
+        return WINDOW_WIDTH;
+    }
+
+    @Override
+    public int getWindowHeight() {
+        return WINDOW_HEIGHT;
+    }
+
     @Override
     public MenuScreen newSettingsScreen(KartGame game) {
         settingsScreen = new SettingsScreen(game);
@@ -19,7 +32,7 @@ public class DesktopSpecifics implements PlatformSpecifics {
 
     @Override
     public void quitGame() {
-        Gdx.graphics.setWindowedMode(800, 480);
+        Gdx.graphics.setWindowedMode(WINDOW_WIDTH, WINDOW_HEIGHT);
     }
 
 

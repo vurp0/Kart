@@ -15,11 +15,12 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.physics.box2d.*;
 import org.sandholm.max.kart.*;
 import org.sandholm.max.kart.gamecontroller.DumbAIGameController;
+import org.sandholm.max.kart.tweenaccessors.MenuScreenAccessor;
 import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
 
 import java.util.ArrayList;
 
-public class KartGameScreen extends UIScreen implements Screen, ContactListener, UIController {
+public class KartGameScreen extends MenuScreen implements Screen, ContactListener, UIController {
 
     enum GameState{RUNNING,PAUSING,PAUSED,UNPAUSING,STARTING}
 
@@ -92,6 +93,8 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     @Override
     public void show() {
+
+        super.show();
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
@@ -166,6 +169,10 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         shake = new Shake();
         skyBatch.setShader(skyBatchShaderProgram);
 
+        menu.menuItems.add(new BaseMenuItem("Resume"));
+        menu.menuItems.add(new BaseMenuItem("Quit"));
+        updateMenuLabels();
+
         updateCamera(0);
 
 /*        Timer.schedule(new Timer.Task() {
@@ -184,10 +191,11 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         camera.viewportWidth = width/(float)height;
         camera.viewportHeight = 1;
 
-        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, true);
+        //frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, true);
+        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, 64, 64, true);
 
         postProcShaderProgram.begin();
-        postProcShaderProgram.setUniformf("u_resolution", width, height);
+        postProcShaderProgram.setUniformf("u_resolution", 64, 64);
         postProcShaderProgram.end();
     }
 
@@ -237,6 +245,8 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     public void pausingRender(float deltaTime) {
         drawKartSceneWithPostProc();
+        drawPauseMenu();
+
     }
     class PausingTweenCallback implements TweenCallback {
         @Override
@@ -250,11 +260,13 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     public void pausedRender(float deltaTime) {
         drawKartSceneWithPostProc();
+        drawPauseMenu();
 
     }
 
     public void unpausingRender(float deltaTime) {
         drawKartSceneWithPostProc();
+        drawPauseMenu();
     }
     class UnpausingTweenCallback implements TweenCallback {
         @Override
@@ -269,6 +281,15 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     public void startingRender(float deltaTime) {
         drawKartSceneWithPostProc();
     }
+
+    public void drawPauseMenu() {
+
+        UIBatch.begin();
+
+        drawMenuLabels();
+        UIBatch.end();
+    }
+
     @Override
     public void fadeInEnded() {
         gameState = GameState.RUNNING;
@@ -303,6 +324,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
         postProcShaderProgram.setUniformf("fadeDark", getBackgroundDarkness());
         postProcShaderProgram.end();
 
+        frameBuffer1.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         frameBuffer1.getColorBufferTexture().bind();
             Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
 
@@ -424,8 +446,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     @Override
     public void preSolve(Contact contact, Manifold oldManifold) {
-        if(compareAB(karts.get(0), contact.getFixtureA().getBody().getUserData(), contact.getFixtureB().getBody().getUserData())){
-        //if(contact.getFixtureA().getBody().getUserData() == karts.get(0)||contact.getFixtureB().getBody().getUserData() == karts.get(0)) {
+        if(karts.get(0) == contact.getFixtureA().getBody().getUserData() || karts.get(0) == contact.getFixtureB().getBody().getUserData()){
             if (Gdx.input.isKeyPressed(Input.Keys.R)) {
                 contact.setEnabled(false);
             }
@@ -434,14 +455,9 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
-        if(compareAB(cameraFollowKart, contact.getFixtureA().getBody().getUserData(), contact.getFixtureB().getBody().getUserData())) {
-        //if(contact.getFixtureA().getBody().getUserData() == cameraFollowKart || contact.getFixtureB().getBody().getUserData() == cameraFollowKart) {
+        if(cameraFollowKart == contact.getFixtureA().getBody().getUserData() || cameraFollowKart == contact.getFixtureB().getBody().getUserData()) {
             shake.shake(0.3f, Math.min(0.8f,impulse.getNormalImpulses()[0]/300));
         }
-    }
-
-    static boolean compareAB(Object compare, Object A, Object B) {
-        return (compare == A || compare == B);
     }
 
 
@@ -480,10 +496,22 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
     public void pausePressed() {
         if (gameState == GameState.RUNNING) {
             gameState = GameState.PAUSING;
-            Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(0.5f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new PausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
+            Timeline.createSequence().beginParallel()
+                        .push(Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(0.5f).ease(TweenEquations.easeInOutCubic))
+                        .push(Tween.to(this, MenuScreenAccessor.MENU_DRAWING_OFFSET, 0.5f).target(screenHeight).ease(TweenEquations.easeInOutCubic))
+                    .end()
+                    .start(game.tweenManager)
+                    .setCallback(new PausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
+            //Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(0.5f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new PausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
         } else if (gameState == GameState.PAUSED) {
             gameState = GameState.UNPAUSING;
-            Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(1f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new UnpausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
+            Timeline.createSequence().beginParallel()
+                        .push(Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(1f).ease(TweenEquations.easeInOutCubic))
+                        .push(Tween.to(this, MenuScreenAccessor.MENU_DRAWING_OFFSET, 0.5f).target(0f).ease(TweenEquations.easeInOutCubic))
+                    .end()
+                    .start(game.tweenManager)
+                    .setCallback(new UnpausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
+            //Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(1f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new UnpausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
         }
 
     }

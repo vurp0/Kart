@@ -74,7 +74,7 @@ public class SettingsScreen extends MenuScreen {
             if (fullScreen) {
                 Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode(Gdx.graphics.getMonitor()));
             } else {
-                Gdx.graphics.setWindowedMode(800, 480);
+                Gdx.graphics.setWindowedMode(game.platformSpecifics.getWindowWidth(), game.platformSpecifics.getWindowHeight());
             }
             resize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
             Gdx.graphics.setCursor(Gdx.graphics.newCursor(new Pixmap(1, 1, Pixmap.Format.RGBA8888), 0, 0));
