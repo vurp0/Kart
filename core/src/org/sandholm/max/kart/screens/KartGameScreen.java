@@ -148,12 +148,12 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
         karts.add(playerKart);
         for (int i = 0; i < 20; i++) {
-            Kart tempKart = new Kart("mario", new Vector2((float) Math.random() * 100, (float) Math.random() * 100), (float) Math.random() * 360, gameWorld);
+            Kart tempKart = new Kart("mario-gameboy", new Vector2((float) Math.random() * 100, (float) Math.random() * 100), (float) Math.random() * 360, gameWorld);
             tempKart.setController(otherKartController);
             karts.add(tempKart);
         }
         for (int i = 0; i < 20; i++) {
-            Kart tempKart = new Kart("tux", new Vector2((float) Math.random() * 100, (float) Math.random() * 100), (float) Math.random() * 360, gameWorld);
+            Kart tempKart = new Kart("tux-gameboy", new Vector2((float) Math.random() * 100, (float) Math.random() * 100), (float) Math.random() * 360, gameWorld);
             tempKart.setController(otherKartController);
             karts.add(tempKart);
         }
@@ -187,7 +187,7 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
         camera.viewportHeight = 1;
 
         //frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, true);
-        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, 160, 144, true);
+        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, 64, 64, true);
 
         //postProcShaderProgram.begin();
         //postProcShaderProgram.setUniformf("u_resolution", screenWidth, screenHeight);
@@ -380,9 +380,9 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
     }
 
     private void drawUI() {
-        UIBatch.begin();
+        /*UIBatch.begin();
         drawText(UIFont, UIBatch, String.valueOf(Gdx.graphics.getFramesPerSecond())+" fps", screenWidth, 0, Anchor.SE);
-        UIBatch.end();
+        UIBatch.end();*/
 
     }
 
