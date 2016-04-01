@@ -23,7 +23,7 @@ import java.util.Map;
  * Defines a gameMap (track) with a spawn point, ground texture, etc.
  */
 public class GameMap {
-    public enum GroundType{SOLID, SLOW, HOLLOW};
+    public enum GroundType{SOLID, HOLLOW, ROAD};
 
     public Texture groundTexture;
     public Texture backgroundTexture;
@@ -91,7 +91,7 @@ public class GameMap {
             }
         }
 
-        objs = map.getLayers().get("Slow layer").getObjects();
+        objs = map.getLayers().get("Road layer").getObjects();
 
         for (MapObject obj: objs) {
             if (obj instanceof TextureMapObject) {
@@ -121,7 +121,7 @@ public class GameMap {
             for (Shape shape: shapes) {
                 Fixture solidFixture = body.createFixture(shape, 1);
                 solidFixture.setSensor(true);
-                solidFixture.setUserData(GroundType.SLOW);
+                solidFixture.setUserData(GroundType.ROAD);
                 shape.dispose();
             }
         }

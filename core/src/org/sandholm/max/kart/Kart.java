@@ -118,7 +118,7 @@ public class Kart {
 
         position.set(pBody.getPosition());
         pBody.setTransform(pBody.getPosition(), rotation*MathUtils.degreesToRadians);
-        if (currentContacts != 0) {
+        if (currentContacts == 0) {
             setFriction(4*FRICTION_S);
         } else {
             setFriction(FRICTION_S);

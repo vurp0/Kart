@@ -32,7 +32,7 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
     private float runningStateTime = 0f;
     private GameState gameState = GameState.STARTING;
 
-    private static float CAMERA_HEIGHT = 4f;
+    private static float CAMERA_HEIGHT = 2.17f;
 
     private ModelBatch quadBatch;
 
@@ -290,12 +290,12 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
         gameState = GameState.RUNNING;
     }
 
-    private void updateCamera(float deltaTime) {
+    private void updateCamera(float deltaTime) { //TODO: this method is absolutely disgusting
         float FOVIntensifier = 0;//cameraFollowKart.getBody().getLinearVelocity().len() * 0.9f;
         cameraAngle = MathUtils.radiansToDegrees * MathUtils.lerpAngle(MathUtils.degreesToRadians * cameraAngle, MathUtils.degreesToRadians * cameraFollowKart.getRotation(), 0.06f);
         camera.fieldOfView = MathUtils.lerp(camera.fieldOfView, cameraFOV + FOVIntensifier, 0.1f);
         cameraVerticalAngle = 10;
-        camera.position.set(new Vector3(cameraFollowKart.getPosition(), 0).add(-8f, 0f, CAMERA_HEIGHT));
+        camera.position.set(new Vector3(cameraFollowKart.getPosition(), 0).add(-5.97f, 0f, CAMERA_HEIGHT));
         camera.up.set(0f, 0f, 1f);
         camera.rotateAround(new Vector3(cameraFollowKart.getPosition(), 0), new Vector3(0f, 0f, 1f), cameraAngle);
         camera.lookAt(new Vector3(cameraFollowKart.getPosition(), CAMERA_HEIGHT));
@@ -413,13 +413,13 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
     @Override
     public void beginContact(Contact contact) {
         if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
-            if (contact.getFixtureB().getUserData() == GameMap.GroundType.SLOW) {
+            if (contact.getFixtureB().getUserData() == GameMap.GroundType.ROAD) {
                 ((Kart)contact.getFixtureA().getBody().getUserData()).currentContacts += 1;
             } else if (contact.getFixtureB().getUserData() == GameMap.GroundType.HOLLOW) {
                 ((Kart)contact.getFixtureA().getBody().getUserData()).resetPosition((float)Math.random()*64f, (float)Math.random()*64f, (float)Math.random()*360f);
             }
         } else if (contact.getFixtureB().getBody().getUserData() instanceof Kart) {
-            if (contact.getFixtureA().getUserData() == GameMap.GroundType.SLOW) {
+            if (contact.getFixtureA().getUserData() == GameMap.GroundType.ROAD) {
                 ((Kart)contact.getFixtureB().getBody().getUserData()).currentContacts += 1;
             } else if (contact.getFixtureA().getUserData() == GameMap.GroundType.HOLLOW) {
                 ((Kart)contact.getFixtureB().getBody().getUserData()).resetPosition((float)Math.random()*64f, (float)Math.random()*64f, (float)Math.random()*360f);
@@ -430,11 +430,11 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
     @Override
     public void endContact(Contact contact) {
         if (contact.getFixtureA().getBody().getUserData() instanceof Kart) {
-            if (contact.getFixtureB().getUserData() == GameMap.GroundType.SLOW) {
+            if (contact.getFixtureB().getUserData() == GameMap.GroundType.ROAD) {
                 ((Kart) contact.getFixtureA().getBody().getUserData()).currentContacts -= 1;
             }
         } else if (contact.getFixtureB().getBody().getUserData() instanceof Kart) {
-            if (contact.getFixtureA().getUserData() == GameMap.GroundType.SLOW) {
+            if (contact.getFixtureA().getUserData() == GameMap.GroundType.ROAD) {
                 ((Kart) contact.getFixtureB().getBody().getUserData()).currentContacts -= 1;
             }
         }

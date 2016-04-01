@@ -8,11 +8,12 @@ import org.sandholm.max.kart.KartGame;
 
 public class DesktopLauncher {
 	public static void main (String[] arg) {
-		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
-		config.setWindowedMode(256, 256);
-		config.setResizable(false);
 
 		DesktopSpecifics desktopSpecifics = new DesktopSpecifics();
+
+		Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
+		config.setWindowedMode(desktopSpecifics.getWindowWidth(), desktopSpecifics.getWindowHeight());
+		config.setResizable(false);
 
 		new Lwjgl3Application(new KartGame(desktopSpecifics), config);
 	}
