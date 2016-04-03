@@ -5,10 +5,15 @@ import aurelienribon.tweenengine.Tween;
 import aurelienribon.tweenengine.TweenCallback;
 import aurelienribon.tweenengine.TweenEquations;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Mesh;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.VertexAttribute;
+import com.badlogic.gdx.graphics.VertexAttributes;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+import com.badlogic.gdx.graphics.glutils.FrameBuffer;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.Matrix4;
 import org.sandholm.max.kart.KartGame;
@@ -22,29 +27,24 @@ abstract public class UIScreen {
     protected SpriteBatch UIBatch;
 
     protected ShaderProgram UIShader;
+    protected ShaderProgram UIPostProcShaderProgram;
+
+
+    protected FrameBuffer UIFrameBuffer;
 
     protected FreeTypeFontGenerator fontGenerator;
 
+    protected Mesh fullScreenMesh = createFullScreenQuad();
     protected int screenWidth;
     protected int screenHeight;
 
     protected float UIDarkness = 0f;
 
-    /* Explanation:
-     * FullScreenDarkness and BackgroundDarkness are up to the UIScreen implementor to decide
-     * FullScreenDarkness is darkness that affects the entire screen (used for fade-ins and outs)
-     * BackgroundDarkness is darkness that affects everything except the currently in-focus thing (for example, the pause menu)
-     */
     public float getFullScreenDarkness() {
         return UIDarkness;
     }
     public void setFullScreenDarkness(float darkness) {
         this.UIDarkness = darkness;
-    }
-    public float getBackgroundDarkness() {
-        return 0;
-    }
-    public void setBackgroundDarkness(float darkness) {
     }
 
     protected KartGame game;
@@ -62,6 +62,13 @@ abstract public class UIScreen {
         UIShader = new ShaderProgram(vertexShader, fragmentShader);
         if (!UIShader.isCompiled()) throw new IllegalArgumentException("couldn't compile UIShader: " + UIShader.getLog());
         UIBatch.setShader(UIShader);
+
+        String postProcVertexShader = Gdx.files.internal("shaders/kartgame.postproc.vert").readString();
+        String postProcFragmentShader = Gdx.files.internal("shaders/kartgame.postproc.frag").readString();
+        UIPostProcShaderProgram = new ShaderProgram(postProcVertexShader, postProcFragmentShader);
+        if (!UIPostProcShaderProgram.isCompiled()) throw new IllegalArgumentException("couldn't compile postproc shader: " + UIPostProcShaderProgram.getLog());
+
+        UIFrameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 64, 64, true);
 
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("Roboto-Regular.ttf"));
     }
@@ -159,6 +166,21 @@ abstract public class UIScreen {
 
         font.draw(batch, glyphLayout, drawX, drawY);
 
+    }
+    protected static Mesh createFullScreenQuad(){
+        float[] verts = new float[] {
+                -1f,-1f,  0f, 0f,
+                1f,-1f,  1f, 0f,
+                1f, 1f,  1f, 1f,
+                -1f, 1f,  0f, 1f
+        };
+        short[] indices = new short[] { 0, 1, 2, 2, 3, 0 };
+        Mesh tmpMesh = new Mesh(true, 4, 6
+                , new VertexAttribute(VertexAttributes.Usage.Position, 2, "a_position")
+                , new VertexAttribute(VertexAttributes.Usage.TextureCoordinates, 2, "a_texCoord0"));
+        tmpMesh.setVertices(verts);
+        tmpMesh.setIndices(indices);
+        return tmpMesh;
     }
 
 

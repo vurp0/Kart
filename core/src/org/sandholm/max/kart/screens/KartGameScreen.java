@@ -21,9 +21,9 @@ import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
 import java.util.ArrayList;
 import java.util.stream.Collectors;
 
-public class KartGameScreen extends MenuScreen implements Screen, ContactListener, UIController {
+public class KartGameScreen extends UIScreen implements Screen, ContactListener, UIController {
 
-    private enum GameState{RUNNING,PAUSING,PAUSED,UNPAUSING,STARTING}
+    private enum GameState{RUNNING,PAUSED,STARTING}
 
     private World gameWorld;
 
@@ -40,33 +40,11 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
     private ArrayList<Quad> kartQuads;
 
     private SpriteBatch skyBatch;
-
-    //Texture groundTexture;
     private PerspectiveCamera camera;
 
     private ShaderProgram postProcShaderProgram;
     private FrameBuffer frameBuffer1;
     private Mesh fullScreenMesh = createFullScreenQuad();
-
-    private float gameSceneDarkness = 0f;
-
-    @Override
-    public float getFullScreenDarkness() {
-        return UIDarkness;
-    }
-    @Override
-    public void setFullScreenDarkness(float darkness) {
-        this.gameSceneDarkness = darkness;
-        this.UIDarkness = darkness;
-    }
-    @Override
-    public float getBackgroundDarkness() {
-        return gameSceneDarkness;
-    }
-    @Override
-    public void setBackgroundDarkness(float darkness) {
-        this.gameSceneDarkness = darkness;
-    }
 
     private float cameraFOV = 45f;
 
@@ -81,8 +59,6 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
     private Kart cameraFollowKart;
     private ArrayList<Kart> karts;
 
-    private BitmapFont UIFont;
-
     public KartGameScreen(KartGame game, String playerKartFileName) {
         super(game);
         this.playerKartFileName = playerKartFileName;
@@ -90,8 +66,6 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
     @Override
     public void show() {
-
-        super.show();
 
         float w = Gdx.graphics.getWidth();
         float h = Gdx.graphics.getHeight();
@@ -104,12 +78,6 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
         ShaderProgram.pedantic = false;
 
-
-        String skyBatchVertexShader = Gdx.files.internal("shaders/kartgame.vert").readString();
-        String skyBatchFragmentShader = Gdx.files.internal("shaders/kartgame.frag").readString();
-        ShaderProgram skyBatchShaderProgram = new ShaderProgram(skyBatchVertexShader, skyBatchFragmentShader);
-        if (!skyBatchShaderProgram.isCompiled()) throw new IllegalArgumentException("couldn't compile shader: " + skyBatchShaderProgram.getLog());
-
         String postProcVertexShader = Gdx.files.internal("shaders/kartgame.postproc.vert").readString();
         String postProcFragmentShader = Gdx.files.internal("shaders/kartgame.postproc.frag").readString();
         postProcShaderProgram = new ShaderProgram(postProcVertexShader, postProcFragmentShader);
@@ -117,8 +85,6 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
         String renderableVertexShader = Gdx.files.internal("shaders/renderablekartgame.vert").readString();
         String renderableFragmentShader = Gdx.files.internal("shaders/renderablekartgame.frag").readString();
-
-        UIDarkness = 0f;
 
         gameMap = new GameMap("lowrestest");
         gameWorld = new World(Vector2.Zero, true);
@@ -160,21 +126,11 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
         kartQuads.addAll(karts.stream().map(k -> new Quad(k.getTextureRegionFromAngle(k.getRotation()), 1.28f, 1.28f)).collect(Collectors.toList()));
 
-        UIFont = generateFont(0.08f);
         shake = new Shake();
-        skyBatch.setShader(skyBatchShaderProgram);
 
-        menu.menuItems.add(new BaseMenuItem("Resume"));
-        menu.menuItems.add(new BaseMenuItem("Quit"));
-        updateMenuLabels();
+        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, 64, 64, true);
 
         updateCamera(0);
-
-/*        Timer.schedule(new Timer.Task() {
-            @Override
-            public void run() {
-            }
-        }, 2f);*/
 
     }
 
@@ -185,13 +141,6 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
 
         camera.viewportWidth = width/(float)height;
         camera.viewportHeight = 1;
-
-        //frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, width, height, true);
-        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, 64, 64, true);
-
-        //postProcShaderProgram.begin();
-        //postProcShaderProgram.setUniformf("u_resolution", screenWidth, screenHeight);
-        //postProcShaderProgram.end();
     }
 
     //TODO: this method could still be useful some day, and I should probably put it somewhere as a generic utility method
@@ -206,14 +155,8 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
             case RUNNING:
                 gameRender(deltaTime);
                 break;
-            case PAUSING:
-                pausingRender();
-                break;
             case PAUSED:
                 pausedRender();
-                break;
-            case UNPAUSING:
-                unpausingRender();
                 break;
             case STARTING:
                 startingRender();
@@ -236,53 +179,12 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
         drawKartSceneWithPostProc();
     }
 
-
-
-    private void pausingRender() {
-        drawKartSceneWithPostProc();
-        drawPauseMenu();
-
-    }
-    private class PausingTweenCallback implements TweenCallback {
-        @Override
-        public void onEvent(int eventType, BaseTween<?> source) {
-            switch (eventType) {
-                case TweenCallback.COMPLETE:
-                    gameState = GameState.PAUSED;
-            }
-        }
-    }
-
     private void pausedRender() {
         drawKartSceneWithPostProc();
-        drawPauseMenu();
-
-    }
-
-    private void unpausingRender() {
-        drawKartSceneWithPostProc();
-        drawPauseMenu();
-    }
-    private class UnpausingTweenCallback implements TweenCallback {
-        @Override
-        public void onEvent(int eventType, BaseTween<?> source) {
-            switch (eventType) {
-                case TweenCallback.COMPLETE:
-                    gameState = GameState.RUNNING;
-            }
-        }
     }
 
     private void startingRender() {
         drawKartSceneWithPostProc();
-    }
-
-    private void drawPauseMenu() {
-
-        UIBatch.begin();
-
-        drawMenuLabels();
-        UIBatch.end();
     }
 
     @Override
@@ -315,9 +217,9 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
             drawKartScene();
         frameBuffer1.end();
 
-        //postProcShaderProgram.begin();
-        //postProcShaderProgram.setUniformf("fadeDark", getBackgroundDarkness());
-        //postProcShaderProgram.end();
+        postProcShaderProgram.begin();
+        postProcShaderProgram.setUniformf("darkness", getFullScreenDarkness());
+        postProcShaderProgram.end();
 
         frameBuffer1.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
         frameBuffer1.getColorBufferTexture().bind();
@@ -329,23 +231,6 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
             postProcShaderProgram.end();
 
         drawUI();
-    }
-
-    private static Mesh createFullScreenQuad(){
-        float[] verts = new float[] {
-            -1f,-1f,  0f, 0f,
-             1f,-1f,  1f, 0f,
-             1f, 1f,  1f, 1f,
-            -1f, 1f,  0f, 1f
-        };
-        short[] indices = new short[] { 0, 1, 2, 2, 3, 0 };
-        Mesh tmpMesh = new Mesh(true, 4, 6
-                , new VertexAttribute(VertexAttributes.Usage.Position, 2, "a_position")
-                , new VertexAttribute(VertexAttributes.Usage.TextureCoordinates
-                , 2, "a_texCoord0"));
-        tmpMesh.setVertices(verts);
-        tmpMesh.setIndices(indices);
-        return tmpMesh;
     }
 
     private void drawKartScene() {
@@ -491,23 +376,11 @@ public class KartGameScreen extends MenuScreen implements Screen, ContactListene
     @Override
     public void pausePressed() {
         if (gameState == GameState.RUNNING) {
-            gameState = GameState.PAUSING;
-            Timeline.createSequence().beginParallel()
-                        .push(Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(0.5f).ease(TweenEquations.easeInOutCubic))
-                        .push(Tween.to(this, MenuScreenAccessor.MENU_DRAWING_OFFSET, 0.5f).target(screenHeight).ease(TweenEquations.easeInOutCubic))
-                    .end()
-                    .start(game.tweenManager)
-                    .setCallback(new PausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
-            //Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(0.5f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new PausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
+            gameState = GameState.PAUSED;
+            setFullScreenDarkness(0.5f);
         } else if (gameState == GameState.PAUSED) {
-            gameState = GameState.UNPAUSING;
-            Timeline.createSequence().beginParallel()
-                        .push(Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(1f).ease(TweenEquations.easeInOutCubic))
-                        .push(Tween.to(this, MenuScreenAccessor.MENU_DRAWING_OFFSET, 0.5f).target(0f).ease(TweenEquations.easeInOutCubic))
-                    .end()
-                    .start(game.tweenManager)
-                    .setCallback(new UnpausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
-            //Tween.to(this, UIScreenAccessor.BACKGROUND_DARKNESS, 0.5f).target(1f).ease(TweenEquations.easeInOutCubic).start(game.tweenManager).setCallback(new UnpausingTweenCallback()).setCallbackTriggers(TweenCallback.COMPLETE);
+            gameState = GameState.RUNNING;
+            setFullScreenDarkness(1f);
         }
 
     }

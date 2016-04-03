@@ -1,6 +1,7 @@
 package org.sandholm.max.kart.screens;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
@@ -56,30 +57,50 @@ public class KartSelectScreen extends MenuScreen {
 
         menuDrawingOffset = MathUtils.lerp(menuDrawingOffset, screenWidth / 2 - menu.getMenuIndex() * screenWidth / 3, 0.1f);
 
-        UIBatch.begin();
-        UIBatch.draw(backgroundTexture, 0, 0, screenWidth, screenHeight,
-                0+(stateTime%1), 0+(MathUtils.sin(stateTime*4)/7),
-                screenWidth/64+(stateTime%1), screenHeight/64+(MathUtils.sin(stateTime*4)/7));
+        UIFrameBuffer.begin();
+        Gdx.gl.glCullFace(GL20.GL_BACK);
+        Gdx.gl.glEnable(GL20.GL_DEPTH_TEST);
+        Gdx.gl.glDepthFunc(GL20.GL_LEQUAL);
+        Gdx.gl.glDepthMask(true);
+            UIBatch.begin();
+            UIBatch.draw(backgroundTexture, 0, 0, screenWidth, screenHeight,
+                    0+(stateTime%1), 0+(MathUtils.sin(stateTime*4)/7),
+                    screenWidth/64+(stateTime%1), screenHeight/64+(MathUtils.sin(stateTime*4)/7));
 
-        for (int i=0; i<menu.menuItems.size(); i++) {
-            if (menu.menuItems.get(i) instanceof KartMenuItem) {
-                float kartAngle;
-                if (i == menu.getMenuIndex()) {
-                    kartAngle = stateTime*90;
-                    UIBatch.setColor(1,1,1,1);
-                } else {
-                    kartAngle = (menuDrawingOffset+i*screenWidth/3-screenWidth/2)/-10+180;
-                    UIBatch.setColor(1,1,1,0.75f);
+            for (int i=0; i<menu.menuItems.size(); i++) {
+                if (menu.menuItems.get(i) instanceof KartMenuItem) {
+                    float kartAngle;
+                    if (i == menu.getMenuIndex()) {
+                        kartAngle = stateTime*90;
+                        UIBatch.setColor(1,1,1,1);
+                    } else {
+                        kartAngle = (menuDrawingOffset+i*screenWidth/3-screenWidth/2)/-10+180;
+                        UIBatch.setColor(1,1,1,0.75f);
+                    }
+
+                    UIBatch.draw(((KartMenuItem)menu.menuItems.get(i)).kart.getTextureRegionFromAngle(kartAngle), menuDrawingOffset+i*screenWidth/3-(screenHeight/14), (screenHeight/2), screenHeight/7, screenHeight/7);
                 }
-
-                UIBatch.draw(((KartMenuItem)menu.menuItems.get(i)).kart.getTextureRegionFromAngle(kartAngle), menuDrawingOffset+i*screenWidth/3-(screenHeight/14), (screenHeight/2), screenHeight/7, screenHeight/7);
+                UIBatch.setColor(1,1,1,1f);
             }
-            UIBatch.setColor(1,1,1,1f);
-        }
 
-        drawMenuLabels();
+            drawMenuLabels();
 
-        UIBatch.end();
+            UIBatch.end();
+
+        UIFrameBuffer.end();
+
+        UIPostProcShaderProgram.begin();
+        UIPostProcShaderProgram.setUniformf("darkness", getFullScreenDarkness());
+        UIPostProcShaderProgram.end();
+
+        UIFrameBuffer.getColorBufferTexture().setFilter(Texture.TextureFilter.Nearest, Texture.TextureFilter.Nearest);
+        UIFrameBuffer.getColorBufferTexture().bind();
+            Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT | GL20.GL_DEPTH_BUFFER_BIT);
+
+            UIPostProcShaderProgram.begin();
+                fullScreenMesh.render(UIPostProcShaderProgram, GL20.GL_TRIANGLES);
+
+            UIPostProcShaderProgram.end();
     }
 
     public void drawMenuLabels() {

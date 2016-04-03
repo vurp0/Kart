@@ -9,7 +9,7 @@ import org.sandholm.max.kart.screens.UIScreen;
 public class UIScreenAccessor implements TweenAccessor<UIScreen> {
 
     public static final int FULL_SCREEN_DARKNESS = 1;
-    public static final int BACKGROUND_DARKNESS = 2;
+    //public static final int BACKGROUND_DARKNESS = 2;
 
     @Override
     public int getValues(UIScreen target, int tweenType, float[] returnValues) {
@@ -17,9 +17,9 @@ public class UIScreenAccessor implements TweenAccessor<UIScreen> {
             case FULL_SCREEN_DARKNESS:
                 returnValues[0] = target.getFullScreenDarkness();
                 return 1;
-            case BACKGROUND_DARKNESS:
-                returnValues[0] = target.getBackgroundDarkness();
-                return 1;
+            //case BACKGROUND_DARKNESS:
+            //    returnValues[0] = target.getBackgroundDarkness();
+            //    return 1;
             default:
                 assert false;
                 return -1;
@@ -32,9 +32,9 @@ public class UIScreenAccessor implements TweenAccessor<UIScreen> {
             case FULL_SCREEN_DARKNESS:
                 target.setFullScreenDarkness(newValues[0]);
                 break;
-            case BACKGROUND_DARKNESS:
-                target.setBackgroundDarkness(newValues[0]);
-                break;
+            //case BACKGROUND_DARKNESS:
+            //    target.setBackgroundDarkness(newValues[0]);
+            //    break;
             default:
                 assert false;
         }

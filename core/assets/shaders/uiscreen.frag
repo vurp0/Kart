@@ -23,11 +23,15 @@ float grayscale(vec3 rgb) {
 void main()
 {
   vec4 screenColor = vec4(v_color.rgb * texture2D(u_texture, v_texCoords).rgb * darkness, v_color.a * texture2D(u_texture, v_texCoords).a);
-  if (grayscale(screenColor.rgb) < 0.25) {
+  if (screenColor.a > 0) { screenColor.a = 1; } else { screenColor.a = 0; }
+
+  float gray = grayscale(screenColor.rgb);
+
+  if (gray < 0.25) {
     gl_FragColor = vec4(GB_BLACK, screenColor.a);
-  } else if (grayscale(screenColor.rgb) < 0.5) {
+  } else if (gray < 0.5) {
     gl_FragColor = vec4(GB_DARK_GREY, screenColor.a);
-  } else if (grayscale(screenColor.rgb) < 0.75) {
+  } else if (gray < 0.75) {
     gl_FragColor = vec4(GB_LIGHT_GREY, screenColor.a);
   } else {
     gl_FragColor = vec4(GB_WHITE, screenColor.a);
