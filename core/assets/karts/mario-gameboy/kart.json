@@ -1,0 +1,9 @@
+{
+  "name":"Mario",
+  "engineForce":380,
+  "density":12,
+  "turningSpeed":65,
+  "driftingSpeed":75,
+  "width":0.5,
+  "length":0.5
+}
