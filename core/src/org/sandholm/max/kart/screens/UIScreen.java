@@ -68,7 +68,7 @@ abstract public class UIScreen {
         UIPostProcShaderProgram = new ShaderProgram(postProcVertexShader, postProcFragmentShader);
         if (!UIPostProcShaderProgram.isCompiled()) throw new IllegalArgumentException("couldn't compile postproc shader: " + UIPostProcShaderProgram.getLog());
 
-        UIFrameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, 64, 64, true);
+        UIFrameBuffer = new FrameBuffer(Pixmap.Format.RGBA8888, game.LOWRES_WIDTH, game.LOWRES_HEIGHT, true);
 
         fontGenerator = new FreeTypeFontGenerator(Gdx.files.internal("Roboto-Regular.ttf"));
     }

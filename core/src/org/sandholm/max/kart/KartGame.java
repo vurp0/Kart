@@ -15,6 +15,9 @@ import org.sandholm.max.kart.tweenaccessors.UIScreenAccessor;
 public class KartGame extends Game {
     static float FADEOUT_TIME = 0.75f;
 
+    public static int LOWRES_WIDTH = 64;
+    public static int LOWRES_HEIGHT = 64;
+
     public PlatformSpecifics platformSpecifics;
 
     public enum Flow{TITLE_SCREEN,MAIN_MENU_SCREEN,SETTINGS_SCREEN,CONTROLLER_MAPPING_SCREEN,KART_SELECT_SCREEN,MAP_SELECT_SCREEN,GAME_SCREEN,RESULTS_SCREEN};

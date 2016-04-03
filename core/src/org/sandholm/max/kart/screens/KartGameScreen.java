@@ -128,7 +128,7 @@ public class KartGameScreen extends UIScreen implements Screen, ContactListener,
 
         shake = new Shake();
 
-        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, 64, 64, true);
+        frameBuffer1 = new FrameBuffer(Pixmap.Format.RGBA8888, game.LOWRES_WIDTH, game.LOWRES_HEIGHT, true);
 
         updateCamera(0);
 
